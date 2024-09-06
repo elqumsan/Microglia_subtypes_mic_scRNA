@@ -1,0 +1,305 @@
+---
+title: "Identify cell types/subtypes of microglia that are dysregulated by induced the antiretroviral drugs"
+author: "Mustafa AbuElqumsan, Xin Liu, and Prof. Shau-Jun TANG "
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    toc: yes
+    toc_depth: 3
+  html_document:
+    code_folding: hide
+    fig_caption: yes
+    highlight: zenburn
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+  word_document: default
+  bookdown::html_document2: default 
+# bibliography: Bibliography.bib
+biblio-style: "apalike"
+link-citations: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+knitr::opts_chunk$set(error = FALSE, include=FALSE,  eval=FALSE, echo=TRUE, warning=FALSE)
+```
+
+```{r}
+# Suppress Loading message when build the report 
+suppressPackageStartupMessages(
+  {
+#devtools::install_github("satijalab/azimuth", "seurat5")    
+#library(Azimuth)
+library(recount)
+library(SummarizedExperiment)
+library(S4Vectors)
+library(TFBSTools)
+
+library(knitr)
+library(SummarizedExperiment)
+library(SeuratObject)
+library(Seurat)
+library(ggplot2)
+library(SingleR)
+library(dplyr)
+library(celldex)
+library(RColorBrewer)
+library(SingleCellExperiment)
+library(patchwork) 
+library(BiocManager)
+library(glmGamPoi)
+    
+  }
+)
+
+```
+
+# The structuring of data 
+
+we had generated our data from 10x genomics, we had 2463920 single cell that were sequenced on the lllumina NexSeq 500, the returning unique molecular identified (UMI) is it count matrix from cell. the values in this matrix represent the number of molecules for each feature that means it is a gene in row that are detected in each cell. 
+
+```{r}
+
+Wtdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
+WT_Project <- "WT_data_Microglia"
+AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
+AZT_Project <-  "AZT_data_Microglia"
+
+WTdata <- Read10X(data.dir = Wtdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
+AZTdata <- Read10X(data.dir = AZTdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
+```
+
+
+# Creating the object to maintain the data
+The object has been created using Seurat package, to save all data required count matrix and the resulting analysis as like scaled data, PCA, and clustering results
+
+```{r}
+WT_object <- Seurat:: CreateSeuratObject(counts = WTdata , project = WT_Project , min.cells = 3, min.features = 300)
+AZT_object <- CreateSeuratObject(counts = AZTdata , project = AZT_Project , min.cells = 3, min.features = 300)
+
+```
+
+# Merge individual Seurat Objects into Single Seurat Object
+Due to our goal is to matching shared cell types across data, even though the integration could result in a loss of biological resolution. But we had preferred here to done the intergration for our data to check up the effect of integration into the efeciancy of clustering of Seurat package.
+
+```{r}
+merged_objects <- merge(WT_object, y = AZT_object, add.cell.ids = c("WT", "AZT"), project = "Merged WT_AZT", 
+                            merge.data = TRUE )
+
+```
+
+# Calculate the percentage of counts originating from a set of features "Visualize feature-feature relationships" and then Visualize QC metrics that are used to fillter cells.
+By this step we had filtered cells based on our criteria :-
+* The number of unique genes detected in each cell
+* Similarly, the total number of molecules detected within a cell.
+* Percentage of reads that map to the mitochondrial genome
+
+```{r figs,echo= TRUE, fig.width= 7, fig.height=6 ,fig.show='animate'}
+merged_objects[["percent.mt"]]<- PercentageFeatureSet(merged_objects, pattern = "^MT-")
+
+merged_objects[["percent.Ctss"]]<- PercentageFeatureSet(merged_objects, pattern = "^Ct")
+merged_objects[["percent.Cx3cr1"]]<- PercentageFeatureSet(merged_objects, pattern = "^Cx")
+merged_objects[["percent.Tmem119"]] <-PercentageFeatureSet(merged_objects, pattern = "^Tm")
+merged_objects[["percent.P2ry12"]] <- PercentageFeatureSet(merged_objects, pattern = "^P2r")
+
+
+png(filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/QC-of-features.png", width = 800, height = 600)
+VlnPlot(merged_objects,features = c("nFeature_RNA", "nCount_RNA","percent.Ct","percent.Cx","percent.Tm","percent.P2r"))
+dev.off()
+
+
+p1 <- FeatureScatter(merged_objects, feature1 = "nFeature_RNA", feature2 =  "nCount_RNA")
+p2 <- FeatureScatter(merged_objects, feature1 = "percent.Ctss",   feature2 =  "nCount_RNA")
+p3 <- FeatureScatter(merged_objects, feature1 = "percent.Cx3cr1",   feature2 =  "nCount_RNA")
+p4 <- FeatureScatter(merged_objects, feature1 = "percent.Tmem119",   feature2 =  "nCount_RNA")
+p5 <- FeatureScatter(merged_objects, feature1 = "percent.P2ry12",  feature2 =  "nCount_RNA")
+
+
+
+
+#dev.off()
+png( filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/scatter_QC.png", width = 800 , height = 600)  
+  p1 + p2 + p3 + p4 +p5
+ dev.off()
+#objWT_Azi <- RunAzimuth(WT_object , reference = "mousecortexref" )
+#objAZT_Azi <- RunAzimuth(AZT_object , reference = "mousecortexref" )
+#objAzi_merged <- merge(objWT_Azi, y = objAZT_Azi)
+
+#get cells IDs
+# i= 21 (PCA number = 21 ) # j-0.5 (Cluster resolution 0.5)
+# cells <- meta %>% filter(seurat_clusters %in% 0:11)
+
+
+#obj_norm <- NormalizeData(merged_objects) 
+#obj_varF <- FindVariableFeatures(obj_norm)
+#obj_scale <- ScaleData(obj_varF)
+#obj_PCA <- RunPCA(obj_scale)
+
+```
+
+
+```{r }
+p1 + p2 + p3 + p4 +p5
+
+```
+
+
+# Normailization of the data 
+we removed unwanted cells from dataset, by such step we trying to employ a global-scalling normalization method "LogNormalize"that normalizes the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10.000 by default) and log-transforms the result 
+
+```{r}
+obj_PCA  <-  NormalizeData(merged_objects) %>% FindVariableFeatures() %>% ScaleData() %>% RunPCA()  
+
+```
+
+# Identification of highly vaiable features(Feature selction)
+we can show a subset of features that exhibit high cell-to-cell variation in dataset.
+
+```{r}
+merged_objects <-  FindVariableFeatures(obj_PCA, selection.method = "vst", nfeatures = 2000)
+top10 <- head(VariableFeatures(merged_objects), 10)
+plot1 <- VariableFeaturePlot(merged_objects)
+plot2 <-LabelPoints(plot = plot1, points = top10, repel = FALSE)
+plot1 + plot2
+
+png(filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/High_variableFeature.png", width = 800 , height = 600)
+plot1 + plot2
+dev.off()
+
+```
+
+# Scaling the data
+we applied a linear transformation as the standard pre-processing step before to dimensional reduction done it, to shifts the expression of each gene and by that the mean expression across cells is Zero, and Scale the expression of each gene by that the variance across cells is 1.
+We could regress out heterogeneity associated with cell cycle stage as well
+
+```{r}
+all.genes <- rownames(merged_objects)
+scale_data <- ScaleData(merged_objects, features = all.genes)
+
+scale_data <- ScaleData(merged_objects , vars.to.regress = "percent.mt")
+
+
+```
+
+# we can visualizing both cells and features that define the PCA 
+we can explore of the primary source of heterogeneity in our data we trying to decide which PCs to include for further downstream analysis, by which both cells and features are ordered according to their PCA scores. this for exploring correlated feature set
+```{r}
+DimReduction = VizDimLoadings(scale_data, dims = 1:2 , reduction = "pca")
+
+ggsave(filename = paste( "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/","DimReduction.png", sep = ""), plot = DimReduction, dpi = 300)
+
+#png(filename ="/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/DimReduction.png", width = 800 , height = 600)
+#print(DimReduction)
+#while(!is.null(dev.list())) dev.off()
+
+
+#png(filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/DimmPlot.png", width = 800, height = 600)
+DimPlot = DimPlot(scale_data, reduction = "pca" ) + NoLegend()
+#while(!is.null(dev.list())) dev.off()
+
+ggsave(filename = paste("/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "DimPlot.png", sep = ""), plot = DimPlot, dpi=300)
+
+
+#png(filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/DimHeatmap.png", width = 800, height = 600)
+
+p <- DimHeatmap(scale_data, dims = 1:3, cells = 500 , balanced = TRUE)
+ggsave(filename = paste("/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "DimHeatmap.png", sep = ""), plot =  DimHeatmap(scale_data, dims = 1:2, cells = 500 , balanced = TRUE), dpi = 300)
+
+while(!is.null(dev.list())) dev.off() 
+  
+```
+# Elbow Plot 
+Is a ranking of principle component based on the precentage of variance explained by each one
+```{r}
+elbow = ElbowPlot(scale_data)
+ggsave(filename = paste("/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "elbow.png", sep = ""), plot = elbow, dpi = 300 )
+
+```
+
+
+
+# clustering this dataset which would return predominantly batch-specific clusters
+The principle of clustering here is distance by k-nearest neighbour (KNN)graph with edges drawn between cells with similar feature expression patterns, and then attempt to partition this graph into highly interconnected communities, that can happened by euclidean distance in PCA sapce, and refine the edge weights between any two cells based on the shared overlap in their local neighborhoods (jaccard similarity). and then clustering process could been done by apply modularity optimization techniques such as the Louvain algorithm or SLM to iteratively group cells together, with the goal of optimizing standard modularity function,
+(UMAP/tSNE) are non-linear dimensional reduction techniques, to visualize and explore the dataset, but the goal of these algorithms is to learn underlying sturcture in dataset, in order to place similar cells together in low-dimensional space. therefore, cells that are grouped together within graph-based clusters.these methods aim to preserve local distance in dataset(ensuring that cells with very similar gene expression profiles co-localize), but often do not preserve more global relationships. But we should take in our considerations to avoid biological conclusions solely on the basis of visualization techniques  
+
+
+```{r}
+obj_neighbours<- FindNeighbors(obj_PCA, dims = 1:30, reduction = "pca")
+obj_clustered <- FindClusters(obj_neighbours, resolution = 2, cluster.name = "integrated_clusters")
+obj_umap <- RunUMAP(obj_clustered, dims = 1:15, reduction = "pca", reduction.name = "umap.integrated")
+
+cluster_plot = DimPlot(obj_umap, reduction = "umap.integrated", group.by = c("orig.ident", "integrated_clusters", "seurat_clusters"))
+
+#png(filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/DimPlot2.png", width = 800 , height = 600)
+ggsave(filename = paste("/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "cluster_plot.png", sep = ""), plot = cluster_plot, dpi = 300)
+#DimPlot(obj_umap, reduction = "umap.integrated", group.by = c("orig.ident", "integrated_clusters", "seurat_clusters"))
+#while(!is.null(dev.list())) dev.off()
+  
+#p1 <-  DimPlot(objWT_Azi , group.by = "predicted.subclass.score", label = TRUE, label.size = 3) + NoLegend() 
+# Idents(obj_umap) <-"predicted.celltype.12"
+p1 <- FeaturePlot(obj_umap, features =  c("Tmem119", "Ctss", "Cx3cr1", "P2ry12"), min.cutoff = "q4") 
+VlnPlot(obj_umap, features =c("Tmem119", "Ctss", "Cx3cr1", "P2ry12") )
+
+
+```
+
+# Identifying differentially epressed features
+we looking to identifying clustering via differential expression (DE), by identifies positive and negative markers of a single cluster, compared to all other cells.
+we can use several tests for differential expression. e.g. the ROC test returns the classification power for individual marker ranging from 0-random, to 1-perfect.
+and then we show expression probability distributions across clusters, visualize feature expression. 
+```{r}
+Joint_layers_obj <- JoinLayers(obj_umap)
+cluster2_markers <- FindMarkers(object = Joint_layers_obj, ident.1 = 2)
+
+
+object_all_markers <- FindAllMarkers(object = Joint_layers_obj, only.pos = TRUE)
+object_all_markers %>% group_by(cluster) %>% dplyr::filter(avg_log2FC > 1)
+
+cluster0_markers <- FindMarkers(object = Joint_layers_obj, ident.1 = 0, logfc.threshold = 0.25, test.use = "roc", only.pos = TRUE)
+
+#Cluster_tree <- BuildClusterTree(object = obj_clustered)
+
+#cluster_markers <- FindMarkers(object = Cluster_tree , ident.1 =   )
+VlnPlot = VlnPlot(Joint_layers_obj, features = c("Tmem119", "Ctss", "Cx3cr1", "P2ry12") ) 
+feature_plot  = FeaturePlot(Joint_layers_obj, features = c("Tmem119", "Ctss", "Cx3cr1", "P2ry12"))
+ggsave(filename = paste( "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "VlnPlot.png", sep = ""), plot = VlnPlot, dpi = 300 )
+ggsave(filename = paste("/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "FeaturePlot.png", sep = ""), plot = feature_plot, dpi = 300 )
+
+```
+
+# we find the epression heatmap for given cells and featurs
+We are plotting the top 20 markers for each cluster
+
+```{r , eval=FALSE, echo=FALSE}
+object_all_markers %>%
+  group_by(cluster) %>%
+  dplyr::filter(avg_log2FC > 1) %>%
+  slice_head(n = 10) %>%
+  ungroup() -> top10
+do_heat_map = DoHeatmap(Joint_layers_obj, features = top10$gene) + NoLegend()
+do_heat_map
+ggsave(paste(filename = paste( "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "heatMap.png", sep = ""), plot =  do_heat_map, dpi= 300 ))
+
+```
+
+# Assigning cell type identity to clusters
+We had used canonical markers to easily match the unbiased clustering to known cell types
+```{r}
+new_cluster_ides <-  c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono","NK", "DC", "Platelet")
+names(new_cluster_ides) <-levels(Joint_layers_obj)[1:9]
+
+Joint_layers_obj <-RenameIdents(Joint_layers_obj[1:9],  new_cluster_ides)
+
+DimPlot(Joint_layers_obj, label = TRUE, pt.size = 0.5) + NoLegend()
+
+Dim_cells_plot = DimPlot(Joint_layers_obj, label = TRUE, label.size = 4.5) + xlab("UMAP 1") + ylab("UMAP 2") + theme(axis.title = element_text(size = 18) +
+  guide_legend(override.aes = list(size = 10)))
+ggsave( paste( filename = "/shared/home/mabuelqumsan/Microglia_subtypes_mic_scRNA-/findings/", "Dim_cells_plot.png", sep = "" ), plot = Dim_cells_plot, dpi = 300)
+
+```
+
