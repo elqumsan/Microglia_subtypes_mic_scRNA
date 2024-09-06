@@ -1,0 +1,33 @@
+global: ## Global parameters are those who are the same across all study cases
+
+  feature: "" 
+
+  dir: ## Directories
+  path_in: 
+  Wtdata.path: "/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/"
+  WT_Project:  "WT_data_Microglia"
+  AZTdata.path: "/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/"
+  AZT_Project:  "AZT_data_Microglia"
+  path_out: "../Microglia_subtypes_mic_scRNA-/findings/"
+  Path_QC_Strain_findings: "../Microglia_subtypes_mic_scRNA-/findings/01a_QC_strains/"
+  path_microglai_statistics: "../Microglia_subtypes_mic_scRNA-/findings/04b_microglia_statistics"
+  path_microglia_clustering: "../Microglia_subtypes_mic_scRNA-/findings/04a_microglia_clustering"
+
+  path_microglia_integration: "../Microglia_subtypes_mic_scRNA-/findings/01b_integrated_data/"
+
+  path_DE_seq_edgeR: "../Microglia_subtypes_mic_scRNA-/findings/03_DE_seq_edgeR"
+  path_compare_strain: "../Microglia_subtypes_mic_scRNA-/findings/05_mic_compare_strain"
+  path_data: "../Microglia_subtypes_mic_scRNA-/data/"
+
+  variables: ## 
+  batch: ["AZT","WT"]
+  round: "r3_mg"
+# strain: ["AZT","WT"]
+  features: ["mg_genes","ribo_genes"]
+  pca_dim: ["9", "20"]
+  res: ["0.5", "0.6", "0.7"]
+  plot_title: "int_mg"
+  strain: ["AZT_WT"] 
+
+#  filtering: ""
+#  standadisation: "" 
