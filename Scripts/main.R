@@ -1,4 +1,3 @@
-main
 
 library(yaml)
 
