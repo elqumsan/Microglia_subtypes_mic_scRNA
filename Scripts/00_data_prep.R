@@ -28,7 +28,7 @@ library("BiocManager")
 library("glmGamPoi")
 library('enrichCellMarkers')
 
-source("../Microglia_subtypes_mic_scRNA-/Functions/norm_scale_dim_cluster_qc.R")
+source("../Microglia_subtypes_mic_scRNA/Functions/norm_scale_dim_cluster_qc.R")
 
 #source("../Microglia_subtypes_mic_scRNA-/Functions/norm_scale_dim_cluster_qc.R")
 #source("../Microglia_subtypes_mic_scRNA-/scripts/02_QC_starin_split.R")
@@ -75,6 +75,9 @@ microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "P2ry12" ,"Cd81" ,"Cst3
 integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list )
 integrated_object[["percent.mt"]] <- PercentageFeatureSet(integrated_object, pattern = "^MT-")
 
+
+## Check cell type for some cluster (check selected cluster, don't need to check all)
+
 results = CMenrich(gene.list = c('Sall1', 'Hexb', 'Fcrls', 'Gpr43', 'Cx3cr1', 'Tmem119', 'Trem2', 'P2ry12', 'Mertk', 'Pros1','Siglech'), species = 'mouse' )
 
 
@@ -83,7 +86,7 @@ pca_dim = 11
 integrated_object<- integrated_object %>% 
                       NormalizeData() %>%
                       FindVariableFeatures(selection.method = "vst", nfeatures = 3000) %>%
-                      ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo")) %>%
+                      ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
                       RunPCA() %>%
                       RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
                       FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%

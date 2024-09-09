@@ -13,23 +13,23 @@ library('tidyr')
 library("enrichCellMarkers")
 source("../Microglia_subtypes_mic_scRNA-/Functions/norm_scale_dim_cluster_qc.R")
 
-Wtdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
-WT_Project <- "WT_data_Microglia"
-AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
-AZT_Project <-  "AZT_data_Microglia"
+#Wtdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
+#WT_Project <- "WT_data_Microglia"
+#AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
+#AZT_Project <-  "AZT_data_Microglia"
 
-WTdata  <- Read10X(data.dir = Wtdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
-AZTdata <- Read10X(data.dir = AZTdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
-WT_object <-  CreateSeuratObject(counts = WTdata, project = "Microglia subtypes_WT", min.cells = 3, min.features = 300)
-AZT_object <- CreateSeuratObject(counts = AZTdata, project = "Microglia subtypes_AZT", min.cells = 3, min.features = 300)
+#WTdata  <- Read10X(data.dir = Wtdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
+#AZTdata <- Read10X(data.dir = AZTdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
+#WT_object <-  CreateSeuratObject(counts = WTdata, project = "Microglia subtypes_WT", min.cells = 3, min.features = 300)
+#AZT_object <- CreateSeuratObject(counts = AZTdata, project = "Microglia subtypes_AZT", min.cells = 3, min.features = 300)
 
-integrated_object <-  merge(WT_object, y = AZT_object, add.cell.ids = c("WT", "AZT"), merge.data= TRUE)
+#integrated_object <-  merge(WT_object, y = AZT_object, add.cell.ids = c("WT", "AZT"), merge.data= TRUE)
 
-integrated_object[["strain"]] <- factor(integrated_object@meta.data$orig.ident)
-integrated_object$strain <- str_replace(integrated_object$strain, pattern = "Microglia subtypes_WT", replacement = "WT" )
-integrated_object$strain <- str_replace(integrated_object$strain,  pattern ="Microglia subtypes_AZT", replacement = "AZT" )
+#integrated_object[["strain"]] <- factor(integrated_object@meta.data$orig.ident)
+#integrated_object$strain <- str_replace(integrated_object$strain, pattern = "Microglia subtypes_WT", replacement = "WT" )
+#integrated_object$strain <- str_replace(integrated_object$strain,  pattern ="Microglia subtypes_AZT", replacement = "AZT" )
 
-integrated_object[["percent.mt"]] <-PercentageFeatureSet(integrated_object, pattern = "^MT-")
+#integrated_object[["percent.mt"]] <-PercentageFeatureSet(integrated_object, pattern = "^MT-")
 
 # integrated_object <- subset(integrated_object, subset = nFeature_RNA > 600 & percent.mt < 8)
 
@@ -42,15 +42,15 @@ integrated_object[["percent.mt"]] <-PercentageFeatureSet(integrated_object, patt
 
 ####### ribosomal gene
 
-ribo.genes <- grep(pattern = "^Rp[s1][[:digit:]]", x = rownames(integrated_object@assays$RNA), value = TRUE)
-integrated_object$percent.ribo <- PercentageFeatureSet(integrated_object,features = ribo.genes)
+#ribo.genes <- grep(pattern = "^Rp[s1][[:digit:]]", x = rownames(integrated_object@assays$RNA), value = TRUE)
+#integrated_object$percent.ribo <- PercentageFeatureSet(integrated_object,features = ribo.genes)
 
 
 #some of Microglia genes list ( "lfit3","lfitm3", "lrf7","Hexb" ,"Rps21", "Rps24","Lpl","Apoe","Ccl4","Ccl3", "C3ar1", "Stmn1","Top2a", "Birc5")
 
-microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "P2ry12" ,"Cd81" ,"Cst3","Cst7")
+#microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "P2ry12" ,"Cd81" ,"Cst3","Cst7")
 
-integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list)
+#integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list)
 
 
 
