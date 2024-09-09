@@ -96,14 +96,14 @@ ggsave(paste(global_var$global$Path_QC_Strain_findings, "DimPlot1",".png", sep =
 
 DimPlot(integrated.strain, reduction = "umap" ,label = FALSE, group.by = "strain", pt.size = 0.001 )
 
-DimPlot(integrated.strain, reduction = "umap" ,label = FALSE, group.by = "Strain", pt.size = 0.001 )
+DimPlot(integrated.strain, reduction = "umap" ,label = FALSE, group.by = "strain", pt.size = 0.001 )
 
 ggsave(paste(global_var$global$Path_QC_Strain_findings, res, "_", "DimPlot3", ".png", sep = ""), units = "in", width = 7.3, height = 7, dpi = 150)
 
 # DimPlot(integrated.strain, reduction = "umap", label = TRUE, pt.size = 0.001, split.by = "seurat_clusters")
 
 ###### QC: violin plot of nfeatures_RNA, percent.mt, percent.ribo for each cluster
-p_QC <-c("nFeature_RNA", "percent.mt", "percent.ribo") %>% map(~QC_plot(integrated.strain@meta.data, .))
+p_QC <-c("nFeature_RNA", "percent.mt", "percent.ribo", "percent.microglia") %>% map(~QC_plot(integrated.strain@meta.data, .))
 p <-plot_grid(plotlist = p_QC, ncol = 1, align = "hv")
 title <- ggdraw()+ draw_label(paste(global_var$global$strain,global_var$global$round, global_var$global$res, "QC", sep = " "), fontface = 'bold')
 plot_grid(title, p, ncol = 1, rel_heights = c(0.1,1))
