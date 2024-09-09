@@ -17,7 +17,7 @@ rda_list <- vector(mode = "list", length = length(rda_file))
 
 ## save cell metadata and marker infor into rda
 
-meta <- integrated.strain@meta.data %>% select(-starts_with("^ribo_"))
+meta <- object.integrated@meta.data %>% select(-starts_with("^ribo_"))
 
 
 for(i in seq_along(rda_list)) {
@@ -95,30 +95,32 @@ object.integrated <- JackStraw(object.integrated, num.replicate = 15, dims = 30)
 object.integrated <- ScoreJackStraw(object.integrated)
 
 ElbowPlot(object.integrated, ndims = 30)
+ElbowPlot(object.integrated, ndims = 30) + ggtitle(label = "Integrated_data")
+
 
 
 print(object.integrated[["pca"]], dims = 1:30 , nfeatures = 10)
 
-integrated..anchors <- FindIntegrationAnchors(object.list = integrated.merged,
-                                              dims = 1:30,
-                                              anchor.features = 3000)
+#integrated.anchors <- FindIntegrationAnchors(object.list = integrated.merged,
+#                                              dims = 1:30,
+#                                              anchor.features = 3000)
 
-integrated.merged <-IntegrateData(anchorset =  , dims = 1:30 )
+#integrated.merged <-IntegrateData(anchorset =  , dims = 1:30 )
 
-De
+
 
 
 
 # Use different PCA and resolution to determine clusters less PCA dimension: pca dim 12
 
-DefaultAssay(integrated.strain) <- "integrated"
+#DefaultAssay(object.integrated) <- "integrated"
 
 # generate ElbowPlot to have a guess of how many pca to take
-integrated.strain <- JackStraw(integrated.strain, num.replicate = 15, dims = 30)
-integrated.strain <-ScoreJackStraw(integrated.strain, dims = 1:30)
-ElbowPlot(integrated.strain, ndims = 30) + ggtitle(label = "Integrated_data")
+#object.integrated <- JackStraw(object.integrated, num.replicate = 15, dims = 30)
+#object.integrated <-ScoreJackStraw(object.integrated, dims = 1:30)
+#ElbowPlot(object.integrated, ndims = 30) + ggtitle(label = "Integrated_data")
 
-print(integrated.strain[["pca"]], dims = 1:30 , nfeatures = 10)
+# print(object.integrated[["pca"]], dims = 1:30 , nfeatures = 10)
 
 # then 
 pca_dim <- c(17)
@@ -128,27 +130,27 @@ res <- c(0.5, 0.6, 0.7, 0.8)
 
 for(i in pca_dim){
   DefaultAssay(object.integrated) <- "integrated"
-  integrated.strain <- object.integrated %>%
+  object.integrated <- object.integrated %>%
   RunUMAP(reduction = "pca", dims = 1:i) 
+  
+ # for(j in res){
+    
+#    object.integrated <- object.integrated %>%
+
+#  DefaultAssay(object.integrated) <- "integrated"
+#  object.integrated <- object.integrated %>%
+#  RunUMAP(reduction = "pca", dims = 1:i) 
   
   for(j in res){
     
     object.integrated <- object.integrated %>%
-
-  DefaultAssay(integrated.strain) <- "integrated"
-  integrated.strain <- integrated.strain %>%
-  RunUMAP(reduction = "pca", dims = 1:i) 
-  
-  for(J in res){
-    
-    integrated.strain <- integrated.strain %>%
       FindNeighbors(reduction = "pca", dims = 1:i) %>%
       FindClusters(resolution = j)
     
     ## markers  ( only calculate under the lowest resolution )
     
     if(j== 0.5){
-      DefaultAssay(integrated.strain) <- "RNA"
+      DefaultAssay(object.integrated) <- "RNA"
       integrated_markers <- FindAllMarkers(object.integrated, only.pos = TRUE , min.pct= 0.25, logfc.threshold = 0.25 , max.cells.per.ident = 300 ) # max.cells.per.ident
       proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$strain), margin = 2)
  #     save(integrated_markers, proptb1, file = paste(global_var$global$path_microglia_integration,"pcs_", i, "_res_", j, ".rda", sep = ""))
@@ -177,29 +179,31 @@ for(i in pca_dim){
 
 
 
+
+
 #### Then determine the best pca dim and res combination:  run it again to get marker genes
 
 ## !! Best pca dimension : 20, 21 , 22
 
-top_30 <- integrated_markers %>% group_by(cluster) %>% top_n(n= 30, wt= avg_log2FC)
+# top_30 <- integrated_markers %>% group_by(cluster) %>% top_n(n= 30, wt= avg_log2FC)
 
 ## run the best possible combination
-i=21
-j=0.5
+#i=21
+#j=0.5
 
-DefaultAssay(object.integrated) <- "integrated"
-object.integrated <- object.integrated %>%
-  RunUMAP(reduction = "pca", dims = 1:i) %>%
-  FindNeighbors(reduction = "pca", dims = 1:i) %>%
-  FindClusters(resolution = j )
+#DefaultAssay(object.integrated) <- "integrated"
+#object.integrated <- object.integrated %>%
+#  RunUMAP(reduction = "pca", dims = 1:i) %>%
+#  FindNeighbors(reduction = "pca", dims = 1:i) %>%
+#  FindClusters(resolution = j )
 
 #### markers (only calculate under the lowest resolution )
-DefaultAssay(object.integrated) <- "RNA"
+#DefaultAssay(object.integrated) <- "RNA"
 
-object.integrated<- JoinLayers(object.integrated)
+#object.integrated<- JoinLayers(object.integrated)
 
-integrated_markers <- FindAllMarkers(object.integrated, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, max.cells.per.ident = 300) ## max.cell.per.ident
-proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$strain), margin = 2)
+#integrated_markers <- FindAllMarkers(object.integrated, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, max.cells.per.ident = 300) ## max.cell.per.ident
+#proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$strain), margin = 2)
 
 #save(integrated_markers, proptb1, file=paste(global_var$global$path_data, "pca_", i, "_res_" , j,"_markers_proptb1", ".rda", sep = ""))
 
@@ -207,15 +211,15 @@ proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$strain)
 ## save the object with PCA
 ##saveRDS(object.integrated, paste( global_var$global$path_data, "object.integrated.rds", sep = ""))
 
-meta <- object.integrated@meta.data %>% rownames_to_column(var="cells")
+#meta <- object.integrated@meta.data %>% rownames_to_column(var="cells")
 
 #saveRDS(meta, paste(global_var$global$path_data, "mate.rds", sep = ""))
 
-      integrated_markers <- FindAllMarkers(integrated.strain, only.pos = TRUE , min.pct= 0.25, logfc.threshold = 0.25 , max.cells.per.ident = 300 ) # max.cells.per.ident
-      proptb1 <- prop.table(table(Idents(integrated.strain), integrated.strain$))
+#      integrated_markers <- FindAllMarkers(object.integrated, only.pos = TRUE , min.pct= 0.25, logfc.threshold = 0.25 , max.cells.per.ident = 300 ) # max.cells.per.ident
+#      proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$))
       
-    } # end of if J
+#    } # end of if J
     
-  }# end for res loop
+#  }# end for res loop
   
-} # end for pca_dim loop  
+#} # end for pca_dim loop  
