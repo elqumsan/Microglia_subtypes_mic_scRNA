@@ -76,10 +76,11 @@ object.integrated <-IntegrateData(anchorset = integrated.anchors   , dims = 1:30
 DefaultAssay(object.integrated) <- "integrated"
 
 ## Run the standard workflow for visualization and clustering 
-object.integrated <- ScaleData(object.integrated, vars.to.regress = c("strain", "percent.mt"))
+
+object.integrated <- ScaleData(object.integrated, vars.to.regress = c("strain", "percent.mt", "percent.microglia"))
 object.integrated <- RunPCA(object.integrated, npcs = 30)
 
-## Cluster cells by first using PCA dimension of 30, later tune the different parameters fo find best clustering 
+## Cluster cells by first using PCA dimension of 30, later tune the different parameters to find best clustering 
 object.integrated <- RunUMAP(object.integrated, reduction = "pca", dims = 1:30)
 object.integrated <- FindNeighbors(object.integrated, reduction = "pca", dims = 1:30 )
 object.integrated <- FindClusters(object.integrated, resolution = 0.5)
@@ -97,7 +98,7 @@ object.integrated <- ScoreJackStraw(object.integrated)
 ElbowPlot(object.integrated, ndims = 30)
 ElbowPlot(object.integrated, ndims = 30) + ggtitle(label = "Integrated_data")
 
-
+ggsave(paste(global_var$global$path_microglia_integration, "ElbowPlot_integrated_data", ".png", sep = ""), width = 7, height = 4, dpi = 200)
 
 print(object.integrated[["pca"]], dims = 1:30 , nfeatures = 10)
 
@@ -151,6 +152,9 @@ for(i in pca_dim){
     
     if(j== 0.5){
       DefaultAssay(object.integrated) <- "RNA"
+      ##### Find cluster markers 
+      integrated_joint <- JoinLayers(object.integrated) ### Have always to be before FindAllMarkers Function 
+      
       integrated_markers <- FindAllMarkers(object.integrated, only.pos = TRUE , min.pct= 0.25, logfc.threshold = 0.25 , max.cells.per.ident = 300 ) # max.cells.per.ident
       proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$strain), margin = 2)
  #     save(integrated_markers, proptb1, file = paste(global_var$global$path_microglia_integration,"pcs_", i, "_res_", j, ".rda", sep = ""))
@@ -165,13 +169,18 @@ for(i in pca_dim){
     # visualize
     DimPlot(object.integrated, reduction = "umap", label = TRUE, pt.size = 0.001) +
       ggtitle(label = paste("integration" , i, "res" , j, sep = "_")) + coord_fixed()
-    ggsave(paste(global_var$global$path_microglia_integration, "pca_",  i, "_res_", j,  ".png", sep = "" ), units = "in", width = 7.3, height = 7 , dpi = 300)
+    ggsave(paste(global_var$global$path_microglia_integration, "umap_",  i, "_res_", j,  ".png", sep = "" ), units = "in", width = 7.3, height = 7 , dpi = 150)
     
-    p_QC <- c("nFeature_RNA", "percent.mt", "percent.ribo" ) %>% map(~QC_plot(object.integrated@meta.data, .))
+    DimPlot(object.integrated, reduction = "pca", label = TRUE, pt.size = 0.001) +
+      ggtitle(label = paste("integration" , i, "res" , j, sep = "_")) + coord_fixed()
+    ggsave(paste(global_var$global$path_microglia_integration, "pca_",  i, "_res_", j,  ".png", sep = "" ), units = "in", width = 7.3, height = 7 , dpi = 150)
+    
+    
+    p_QC <- c("nFeature_RNA", "percent.mt", "percent.ribo", "percent.microglia"  ) %>% map(~QC_plot(object.integrated@meta.data, .))
     p <- plot_grid(plotlist = p_QC, ncol = 1, align = "hv")
     title <- ggdraw() + draw_label("integration_data" , fontface = 'bold')
     plot_grid(title, p , ncol = 1, rel_heights = c(0.1, 1 ) )
-    ggsave(paste(global_var$global$path_microglia_integration, "pca_", i, "_res_", j, ".png", sep = "" ), units = "in", width = 10, height = 5, dpi = 200)
+    ggsave(paste(global_var$global$path_microglia_integration, "pca_", i, "_res_", j, "_QC" ,".png", sep = "" ), units = "in", width = 10, height = 5, dpi = 200)
     
   }# end for res loop
   

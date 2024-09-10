@@ -112,7 +112,7 @@ ggsave(paste(global_var$global$Path_QC_Strain_findings, global_var$global$strain
        units = "in" , width = 10, height = 5, dpi = 150 )
 
 ##### Find cluster markers 
-integrated_joint <- JoinLayers(integrated.strain)
+integrated_joint <- JoinLayers(integrated.strain) ### Have always to be before FindAllMarkers Function 
 
 integrated_markers <-FindAllMarkers(integrated_joint, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, max.cells.per.ident = 300 )
 integrated_markers <- integrated_markers %>% rownames_to_column(var = "symbol")
