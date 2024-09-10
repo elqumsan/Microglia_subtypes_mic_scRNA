@@ -107,7 +107,8 @@ p_QC <-c("nFeature_RNA", "percent.mt", "percent.ribo", "percent.microglia") %>% 
 p <-plot_grid(plotlist = p_QC, ncol = 1, align = "hv")
 title <- ggdraw()+ draw_label(paste(global_var$global$strain,global_var$global$round, global_var$global$res, "QC", sep = " "), fontface = 'bold')
 plot_grid(title, p, ncol = 1, rel_heights = c(0.1,1))
-ggsave(paste(global_var$global$Path_QC_Strain_findings, global_var$global$strain,"_", global_var$global$round, "_", global_var$global$res, "_", "QC.png", sep = "" ), 
+ggsave(paste(global_var$global$Path_QC_Strain_findings, global_var$global$strain,"_", global_var$global$round, "_",
+             res, "_", "QC.png", sep = "" ), 
        units = "in" , width = 10, height = 5, dpi = 150 )
 
 ##### Find cluster markers 
