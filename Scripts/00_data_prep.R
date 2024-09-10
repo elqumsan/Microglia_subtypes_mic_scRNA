@@ -114,9 +114,10 @@ integrated_object <-AddMetaData(integrated_object, cellsMetaTrim)
 head(integrated_object)
 
 VlnPlot(integrated_object, c("nCount_RNA", "Gene_IDs"), ncol = 2)
+ggsave(paste(global_var$global$path_microglia_integration, "volcano", ".png", sep = ""), units = "in", width = 10, height = 5, dpi= 200)
 
 DimPlot(integrated_object, group.by = c("orig.ident", "seurat_clusters"))
-
+ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_WT", ".png", sep = ""), units = "in", width = 10, height = 5, dpi = 200)
 
 #integrated_object[["RNA"]] <- split( integrated_object[["RNA"]] ,f =  integrated_object$seurat_clusters )
 #################
