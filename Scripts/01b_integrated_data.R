@@ -153,7 +153,7 @@ for(i in pca_dim){
     if(j== 0.5){
       DefaultAssay(object.integrated) <- "RNA"
       ##### Find cluster markers 
-      integrated_joint <- JoinLayers(object.integrated) ### Have always to be before FindAllMarkers Function 
+      object.integrated<- JoinLayers(object.integrated) ### Have always to be before FindAllMarkers Function 
       
       integrated_markers <- FindAllMarkers(object.integrated, only.pos = TRUE , min.pct= 0.25, logfc.threshold = 0.25 , max.cells.per.ident = 300 ) # max.cells.per.ident
       proptb1 <- prop.table(table(Idents(object.integrated), object.integrated$strain), margin = 2)
