@@ -83,7 +83,9 @@ object.integrated <- RunPCA(object.integrated, npcs = 30)
 ## Cluster cells by first using PCA dimension of 30, later tune the different parameters to find best clustering 
 object.integrated <- RunUMAP(object.integrated, reduction = "pca", dims = 1:30)
 object.integrated <- FindNeighbors(object.integrated, reduction = "pca", dims = 1:30 )
-object.integrated <- FindClusters(object.integrated, resolution = 0.5)
+#object.integrated <- FindClusters(object.integrated, resolution = 0.5)
+
+object.integrated <- FindClusters(object.integrated, resolution = c(0.5 ,0.6, 0.7, 0.8 ))
 
 
 #### determine cell clusters by exploring different PCA dimensions included and cluster resolution
