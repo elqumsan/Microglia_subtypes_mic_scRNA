@@ -145,7 +145,7 @@ for(i in pca_dim){
 #  RunUMAP(reduction = "pca", dims = 1:i) 
   
   for(j in res){
-    
+    DefaultAssay(object.integrated) <- "integrated"
     object.integrated <- object.integrated %>%
       FindNeighbors(reduction = "pca", dims = 1:i) %>%
       FindClusters(resolution = j)
