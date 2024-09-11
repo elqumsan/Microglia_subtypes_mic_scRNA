@@ -58,7 +58,7 @@ markers <- function(object_type, path, strain, round, res ){
   
   # save cell metadata and marker info into rda
   meta <- object_type@meta.data %>% select(-starts_with("ribo_"))
-  save(meta, object_markers, file = paste(path, strain, "_", round, "_", res , "_", "Meta_Marker.rda", sep = ""))
+  #save(meta, object_markers, file = paste(path, strain, "_", round, "_", res , "_", "Meta_Marker.rda", sep = ""))
   return(object_markers)
   
 }
