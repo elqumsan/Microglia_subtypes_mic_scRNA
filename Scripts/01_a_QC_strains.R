@@ -168,7 +168,7 @@ mg.strain <- mg.strain %>%
 
 res ="res_06" # specify which resolution used to cluster cells
 
-res ="res_06" # specify which resolution used to cluster cellls
+
 
 strain <- "AZT_WT"
 mg.markers <-  markers(object_type = mg.strain, path = global_var$global$Path_QC_Strain_findings, strain = global_var$global$strain, round = global_var$global$round, 

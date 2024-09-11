@@ -17,7 +17,7 @@ rda_list <- vector(mode = "list", length = length(rda_file))
 
 ## save cell metadata and marker infor into rda
 
-meta <- object.integrated@meta.data %>% select(-starts_with("^ribo_"))
+meta <- object.significance.PCA.scores@meta.data %>% select(-starts_with("^Mico_"))
 
 
 for(i in seq_along(rda_list)) {
