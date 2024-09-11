@@ -5,11 +5,11 @@
 what_dims <- function(object_type , path, strain, round){
        
   object_type <- JoinLayers(object_type)
-  object_type <-AddModuleScore(object = object_type , features = ribo.genes, ctrl = 100, name = 'ribo_Features' )
+  object_type <-AddModuleScore(object = object_type , features = microglia.gene.list, ctrl = 100, name = 'Microglia_Features' )
   object_type <- object_type %>%
     NormalizeData()%>%
     FindVariableFeatures(selection.methods = "vst", nFeatures = 3000) %>%
-    ScaleData(vars.to.regress = c("ribo.genes", "precent.mt", "nFeature_RNA")) %>%
+    ScaleData(vars.to.regress = c("percent.ribo", "percent.microglia","percent.mt", "nFeature_RNA")) %>%
     RunPCA()
   
   object_type <- JackStraw(object_type, num.replicate = 30, dim = 30)

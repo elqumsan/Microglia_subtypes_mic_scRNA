@@ -71,7 +71,7 @@ meta_tidy <- meta %>%
 ######### ribosomal gene
 ribo.genes <- grep( pattern = "^Rp[s1][[:digit:]]", x = rownames(integrated_object@assays$RNA),value = TRUE)
 integrated_object$percent.ribo <- PercentageFeatureSet(integrated_object, features = ribo.genes)
-microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "P2ry12" ,"Cd81" ,"Cst3","Cst7") 
+microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "Trem2","P2ry12" ,"Cd81" ,"Cst3","Cst7", "Mertk", "Pros1","Siglech", "Sall1", "Hexb", "Fcrls" ) 
 integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list )
 integrated_object[["percent.mt"]] <- PercentageFeatureSet(integrated_object, pattern = "^MT-")
 
