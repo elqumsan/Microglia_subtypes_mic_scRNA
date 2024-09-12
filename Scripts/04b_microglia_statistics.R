@@ -11,14 +11,15 @@ DefaultAssay(integrated.strain) <- "RNA"
 
 sum_table <-  mg.strain@meta.data %>% group_by(seurat_clusters) %>% 
           summarise( N=n(), ave_nCount_RNA=median(nCount_RNA), ave_nFeature_RNA=median(nFeature_RNA), ave_percent.mt=median(percent.mt))
-prop.table(table(Idents(integrated_object),integrated_object$Strain), margin = 2)
+prop.table(table(Idents(integrated.strain),integrated.strain$strain), margin = 2)
 
 
 #### Plot both genotypes in all strains (all replicates combined)
 # generate meta data, 
-integrated.meta <- mg.strain@meta.data %>%
+integrated.meta <- integrated.strain@meta.data %>%
   mutate(strain = factor(strain, levels = c("AZT","WT")),
-         new_clusters= ifelse(seurat_clusters %in% 0:0, "H" ,as.character(seurat_clusters)),
+         new_clusters= ifelse(seurat_clusters %in% 7:15, "H" ,as.character(seurat_clusters)),
+        # new_clusters= ifelse(seurat_clusters %in% 0:0, "H" ,as.character(seurat_clusters)),
          new_clusters=factor(new_clusters, levels = c("1", "2","3","4", "5", "6", "7"))) %>%
   group_by(strain , new_clusters) %>%
   arrange(strain) %>%
