@@ -76,9 +76,12 @@ ggsave(paste(global_var$global$path_microglai_statistics, "cluster_box_all.png",
 ####### Perform two-way ANOVA to determine the effect of strain on the percent of microglia subclusters
 
 clusters <- unique(integrated.meta.stat$new_clusters) %>% as.list()
-data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters[[1]])
-aov_object <-aov( integrated.meta.stat$Percent ~ integrated.meta.stat$new_clusters*integrated.meta.stat$med_percent.microglia, data = data)
+data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters)
+aov_object <-aov( integrated.meta.stat$Percent ~ integrated.meta.stat$new_clusters*integrated.meta.stat$Med_nFeature, data = data)
 aov.pvals <- summary(aov_object)
+
+
+aov.pvals = aov.pvals[[2]][[4]]
 aov.pvals <- aov.pvals %>% t()
 
 
