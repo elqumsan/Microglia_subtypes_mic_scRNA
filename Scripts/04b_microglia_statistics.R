@@ -52,11 +52,11 @@ integrated.meta.stat <- integrated.strain@meta.data %>%
                           N=n()) %>%
   group_by(Percent= N/sum(N)*100)
 
-integratedPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#f0E442", "#0072B2", "#D55E00")  
+integratedPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#f0E442", "#0072B2", "#D55E00", "#CC79A7")  
 
 p <- integrated.meta.stat %>%
   ggplot(aes(y=Percent, x= strain, color = strain )) +
-  geom_boxplot(outlier.size = 0, alph= 0.5) +
+  geom_boxplot(outlier.size = 0, alpha= 0.5) +
   geom_point(aes(color = strain), position = position_jitterdodge(), alpha=0.8) +
   scale_color_manual(values = integratedPalette) +
   theme_bw() +

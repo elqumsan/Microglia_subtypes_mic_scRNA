@@ -90,7 +90,7 @@ integrated_object<- integrated_object %>%
                       RunPCA() %>%
                       RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
                       FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%
-                      FindClusters(resolution = 0.5)
+                      FindClusters(resolution = c(0.5 ,0.6, 0.7, 0.8 ))
 
 
 #### integrated.strain object has no layers, all layers have been merged to be eligible for the rest analysis 
