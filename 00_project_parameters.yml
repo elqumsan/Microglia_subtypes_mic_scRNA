@@ -27,7 +27,7 @@ global: ## Global parameters are those who are the same across all study cases
   pca_dim: ["9", "20"]
   res: ["0.5", "0.6", "0.7"]
   plot_title: "int_mg"
-  strain: ["AZT_WT"] 
+  strain: ["Veh_Azt"] 
 
 #  filtering: ""
 #  standadisation: "" 

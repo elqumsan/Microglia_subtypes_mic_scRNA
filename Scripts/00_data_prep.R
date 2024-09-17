@@ -35,24 +35,24 @@ source("../Microglia_subtypes_mic_scRNA/Functions/norm_scale_dim_cluster_qc.R")
 
 
 
-Wtdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
-WT_Project <- "WT_data_Microglia"
+Vehdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
+Veh_Project <- "WT_data_Microglia"
 AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
 AZT_Project <-  "AZT_data_Microglia"
 
-WTdata  <- Read10X(data.dir = Wtdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
+Vehdata  <- Read10X(data.dir = Vehdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
 AZTdata <- Read10X(data.dir = AZTdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
-WT_object <-  CreateSeuratObject(counts = WTdata, project = "Microglia subtypes_WT", min.cells = 3, min.features = 300)
+Veh_object <-  CreateSeuratObject(counts = Vehdata, project = "Microglia subtypes_Veh", min.cells = 3, min.features = 300)
 AZT_object <- CreateSeuratObject(counts = AZTdata, project = "Microglia subtypes_AZT", min.cells = 3, min.features = 300)
 
-integrated_object <-  merge(WT_object, y = AZT_object, add.cell.ids = c("WT", "AZT"), merge.data= TRUE)
-# object.ref <- subset(integrated_object, orig.ident %in% c("Microglia subtypes_WT" , "Microglia subtypes_AZT"))
+integrated_object <-  merge(Veh_object, y = AZT_object, add.cell.ids = c("Veh", "AZT"), merge.data= TRUE)
+# object.ref <- subset(integrated_object, orig.ident %in% c("Microglia subtypes_Veh" , "Microglia subtypes_AZT"))
 
-strain <- c("Microglia subtypes_WT", "Microglia subtypes_AZT")
+strain <- c("Microglia subtypes_Veh", "Microglia subtypes_AZT")
 cols =  c("#888888", "#00AA00")
 
 integrated_object[["strain"]] <- factor(integrated_object@meta.data$orig.ident, levels = strain)
-integrated_object$strain <- str_replace(integrated_object$strain,pattern = "Microglia subtypes_WT", replacement = "WT" )
+integrated_object$strain <- str_replace(integrated_object$strain,pattern = "Microglia subtypes_Veh", replacement = "Veh" )
 integrated_object$strain <- str_replace(integrated_object$strain, pattern ="Microglia subtypes_AZT", replacement = "AZT" )
 
 #sample_ID <- colnames(integrated_object)
@@ -117,7 +117,7 @@ VlnPlot(integrated_object, c("nCount_RNA", "Gene_IDs"), ncol = 2)
 ggsave(paste(global_var$global$path_microglia_integration, "volcano", ".png", sep = ""), units = "in", width = 10, height = 5, dpi= 200)
 
 DimPlot(integrated_object, group.by = c("orig.ident", "seurat_clusters"))
-ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_WT", ".png", sep = ""), units = "in", width = 10, height = 5, dpi = 200)
+ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_Veh", ".png", sep = ""), units = "in", width = 10, height = 5, dpi = 200)
 
 #integrated_object[["RNA"]] <- split( integrated_object[["RNA"]] ,f =  integrated_object$seurat_clusters )
 #################

@@ -6,22 +6,22 @@ library(SingleCellExperiment)
 library(scater)
 
 ### load object
-DefaultAssay(integrated_object) <- "RNA"
+DefaultAssay(object.integrated) <- "RNA"
 DefaultAssay(integrated.strain) <- "RNA"
 DefaultAssay(mg.strain) <- "RNA"
 
 sum_table <-  mg.strain@meta.data %>% group_by(seurat_clusters) %>% 
           summarise( N=n(), ave_nCount_RNA=median(nCount_RNA), ave_nFeature_RNA=median(nFeature_RNA), ave_percent.mt=median(percent.mt))
-prop.table(table(Idents(integrated.strain),integrated.strain$strain), margin = 2)
+prop.table(table(Idents(mg.strain),mg.strain$strain), margin = 2)
 
 
 #### Plot both genotypes in all strains (all replicates combined)
 # generate meta data, 
 integrated.meta <- mg.strain@meta.data %>%
-  mutate(strain = factor(strain, levels = c("WT","AZT")),
+  mutate(strain = factor(strain, levels = c("Veh","AZT")),
          new_clusters= ifelse(seurat_clusters %in% 8:17, "H" ,as.character(seurat_clusters)),
         # new_clusters= ifelse(seurat_clusters %in% 0:0, "H" ,as.character(seurat_clusters)),
-         new_clusters=factor(new_clusters, levels = c("0","1", "2","3","4", "5", "6", "7"))) %>%
+         new_clusters=factor(new_clusters, levels = c("0","1", "2","3","4", "5", "6", "7", "8", "H"))) %>%
   group_by(strain , new_clusters) %>%
   arrange(strain) %>%
   summarise(N=n())
@@ -42,10 +42,10 @@ ggsave(paste(global_var$global$path_microglai_statistics, "fraction_replicates_s
 
 ############ Box Plot for all microglia
 ############ generate meta data, for statistical testing and box plot 
-integrated.meta.stat <- integrated.strain@meta.data %>%
-                mutate( strain=factor(global_var$global$strain, levels = c("WT", "AZT")),
+integrated.meta.stat <- mg.strain@meta.data %>%
+                mutate( strain=factor(strain, levels = c("Veh", "AZT")),
                         new_clusters = ifelse(seurat_clusters %in% 8:17 , "H", as.character(seurat_clusters)),
-                        new_clusters=factor(seurat_clusters, levels = c("1","2","3","4","5","6", "7"))) %>%
+                        new_clusters=factor(new_clusters, levels = c("0","1","2","3","4","5","6", "7", "H"))) %>%
                 group_by(strain, new_clusters) %>%
                 summarise(Med_nFeature=median(nFeature_RNA),
                           Med_percent_mt= median(percent.mt),
