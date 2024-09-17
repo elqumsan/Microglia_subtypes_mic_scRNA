@@ -8,6 +8,7 @@ library(scater)
 ### load object
 DefaultAssay(integrated_object) <- "RNA"
 DefaultAssay(integrated.strain) <- "RNA"
+DefaultAssay(mg.strain) <- "RNA"
 
 sum_table <-  mg.strain@meta.data %>% group_by(seurat_clusters) %>% 
           summarise( N=n(), ave_nCount_RNA=median(nCount_RNA), ave_nFeature_RNA=median(nFeature_RNA), ave_percent.mt=median(percent.mt))
@@ -16,11 +17,11 @@ prop.table(table(Idents(integrated.strain),integrated.strain$strain), margin = 2
 
 #### Plot both genotypes in all strains (all replicates combined)
 # generate meta data, 
-integrated.meta <- integrated.strain@meta.data %>%
-  mutate(strain = factor(strain, levels = c("AZT","WT")),
-         new_clusters= ifelse(seurat_clusters %in% 7:15, "H" ,as.character(seurat_clusters)),
+integrated.meta <- mg.strain@meta.data %>%
+  mutate(strain = factor(strain, levels = c("WT","AZT")),
+         new_clusters= ifelse(seurat_clusters %in% 8:17, "H" ,as.character(seurat_clusters)),
         # new_clusters= ifelse(seurat_clusters %in% 0:0, "H" ,as.character(seurat_clusters)),
-         new_clusters=factor(new_clusters, levels = c("1", "2","3","4", "5", "6", "7"))) %>%
+         new_clusters=factor(new_clusters, levels = c("0","1", "2","3","4", "5", "6", "7"))) %>%
   group_by(strain , new_clusters) %>%
   arrange(strain) %>%
   summarise(N=n())
@@ -43,6 +44,7 @@ ggsave(paste(global_var$global$path_microglai_statistics, "fraction_replicates_s
 ############ generate meta data, for statistical testing and box plot 
 integrated.meta.stat <- integrated.strain@meta.data %>%
                 mutate( strain=factor(global_var$global$strain, levels = c("WT", "AZT")),
+                        new_clusters = ifelse(seurat_clusters %in% 8:17 , "H", as.character(seurat_clusters)),
                         new_clusters=factor(seurat_clusters, levels = c("1","2","3","4","5","6", "7"))) %>%
                 group_by(strain, new_clusters) %>%
                 summarise(Med_nFeature=median(nFeature_RNA),
@@ -76,12 +78,13 @@ ggsave(paste(global_var$global$path_microglai_statistics, "cluster_box_all.png",
 ####### Perform two-way ANOVA to determine the effect of strain on the percent of microglia subclusters
 
 clusters <- unique(integrated.meta.stat$new_clusters) %>% as.list()
-data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters)
+data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters[1])
 aov_object <-aov( integrated.meta.stat$Percent ~ integrated.meta.stat$new_clusters*integrated.meta.stat$Med_nFeature, data = data)
 aov.pvals <- summary(aov_object)
 
 
-aov.pvals = aov.pvals[[2]][[4]]
+aov.pvals = aov.pvals[[1]] %>% t() %>% as.data.frame()
+names(aov.pvals)<- c("strain", "sum_Sq", "Residuals")
 aov.pvals <- aov.pvals %>% t()
 
 
