@@ -53,7 +53,7 @@ integrated.meta.stat <- mg.strain@meta.data %>%
                           med_percent.microglia=median(percent.microglia),
                           
                           N=n()) %>%
-  group_by(Percent= N/sum(N)*100)
+  group_by(strain,Percent= N/sum(N)*100)
 
 integratedPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#f0E442", "#0072B2", "#D55E00", "#CC79A7")  
 
@@ -79,7 +79,7 @@ ggsave(paste(global_var$global$path_microglai_statistics, "cluster_box_all.png",
 ####### Perform two-way ANOVA to determine the effect of strain on the percent of microglia subclusters
 
 clusters <- unique(integrated.meta.stat$new_clusters) %>% as.list()
-data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters[1])
+data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters[[1]])
 aov_object <-aov( Percent ~ strain, data = data)
 aov.pvals <- summary(aov_object)
 
@@ -91,7 +91,7 @@ aov.pvals <- aov.pvals %>%
            mutate(Cluster = clusters[1] %>% as.character())
 
 aov_Strain <- function(cluster, data){
-         data = data %>% filter(new_clusters %in% clusters) 
+         data = data %>% filter(new_clusters %in% cluster) 
         aov_object = aov(Percent ~ strain, data= data)
         aov.pvals = summary(aov_object)
         aov.pvals = aov.pval[[1]][[2]] %>% t() %>% as.data.frame()
@@ -110,7 +110,15 @@ aov_Strain_object <- function(cluster, data){
   
 }
 
-aov_strain_table <- clusters %>% map_df(aov_Strain, data = integrated.meta.stat )
+
+#aov_strain_table <- clusters %>% map_df( aov_Strain , data =  integrated.meta.stat )
+#aov_strain_table <- clusters %>% mutate_if(is.double, p.adjust)
+
+
+#### Keep the annova object for 
+aov_object_list <- clusters %>% map(aov_Strain_object,data = integrated.meta.stat)
+names(aov_object_list)<- clusters %>% unlist()
+TukeyHSD(aov_object_list[["H"]]) %>% .$`strain` %>% data.frame(.,cluster= "H")
 
 ######### check the statistics on nFeature, percent of microglia, and percent of ribosomal genes for each cluster 
 
