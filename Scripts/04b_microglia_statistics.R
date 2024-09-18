@@ -79,14 +79,37 @@ ggsave(paste(global_var$global$path_microglai_statistics, "cluster_box_all.png",
 
 clusters <- unique(integrated.meta.stat$new_clusters) %>% as.list()
 data  = integrated.meta.stat %>%  filter(new_clusters %in% clusters[1])
-aov_object <-aov( integrated.meta.stat$Percent ~ integrated.meta.stat$new_clusters*integrated.meta.stat$Med_nFeature, data = data)
+aov_object <-aov( Percent ~ strain, data = data)
 aov.pvals <- summary(aov_object)
 
 
-aov.pvals = aov.pvals[[1]] %>% t() %>% as.data.frame()
-names(aov.pvals)<- c("strain", "sum_Sq", "Residuals")
-aov.pvals <- aov.pvals %>% t()
+aov.pvals = aov.pvals[[1]][[2]] %>% t() %>% as.data.frame()
+names(aov.pvals)<- c( "Residuals")
+aov.pvals <- aov.pvals %>% 
+              select(-Residuals) %>%
+           mutate(Cluster = clusters[1] %>% as.character())
 
+aov_Strain <- function(cluster, data){
+         data = data %>% filter(new_clusters %in% clusters) 
+        aov_object = aov(Percent ~ strain, data= data)
+        aov.pvals = summary(aov_object)
+        aov.pvals = aov.pval[[1]][[2]] %>% t() %>% as.data.frame()
+        names(aov.pvals) <- c("Residuals")
+        aov.pvals <- aov.pvals %>% 
+          select(-Residuals) %>%
+          mutate(Cluster = cluster %>% as.character())
+        return(aov.pvals)
+}
+
+
+aov_Strain_object <- function(cluster, data){
+  data = data %>% filter(new_clusters %in% cluster)
+  aov_object = aov(Percent ~ strain , data= data)
+  return(aov_object)
+  
+}
+
+aov_strain_table <- clusters %>% map_df(aov_Strain, data = integrated.meta.stat )
 
 ######### check the statistics on nFeature, percent of microglia, and percent of ribosomal genes for each cluster 
 

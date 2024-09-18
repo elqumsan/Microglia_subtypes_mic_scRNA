@@ -30,6 +30,9 @@ library('enrichCellMarkers')
 
 source("../Microglia_subtypes_mic_scRNA/Functions/norm_scale_dim_cluster_qc.R")
 
+global_var <- read_yaml(file = "../Microglia_subtypes_mic_scRNA/00_project_parameters.yml" )
+
+
 #source("../Microglia_subtypes_mic_scRNA-/Functions/norm_scale_dim_cluster_qc.R")
 #source("../Microglia_subtypes_mic_scRNA-/scripts/02_QC_starin_split.R")
 
