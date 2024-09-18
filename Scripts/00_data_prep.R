@@ -3,6 +3,8 @@ library(tidyverse)
 library(recount)
 library(SummarizedExperiment)
 library(S4Vectors)
+library(yaml)
+
 
 library(stringr)
 library('tidyr')

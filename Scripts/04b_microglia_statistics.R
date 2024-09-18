@@ -11,7 +11,8 @@ DefaultAssay(integrated.strain) <- "RNA"
 DefaultAssay(mg.strain) <- "RNA"
 
 sum_table <-  mg.strain@meta.data %>% group_by(seurat_clusters) %>% 
-          summarise( N=n(), ave_nCount_RNA=median(nCount_RNA), ave_nFeature_RNA=median(nFeature_RNA), ave_percent.mt=median(percent.mt))
+          summarise( N=n(), ave_nCount_RNA=median(nCount_RNA), ave_nFeature_RNA=median(nFeature_RNA), ave_percent.mt=median(percent.mt), 
+                     ave_percent.microglia=median(percent.microglia))
 prop.table(table(Idents(mg.strain),mg.strain$strain), margin = 2)
 
 
@@ -27,16 +28,16 @@ integrated.meta <- mg.strain@meta.data %>%
   summarise(N=n())
 
 p <- ggplot(integrated.meta, aes(y=N, x=strain , fill= new_clusters )) +
-      geom_bar(stat = "identity", position = "fill", color= "red") + 
+      geom_bar(stat = "identity", position = "fill", color= "black") + 
       labs(y="Fraction", fill = "Clusters") +
-      facet_grid(strain~ . ) +
-      coord_flip() +
-  theme(axis.text = element_blank(),
-        axis.title = element_blank(),
-        strip.text = element_blank(),
+      facet_grid(~ strain ) +
+    #  coord_flip() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1 , face = c("bold", "bold.italic")),
+        axis.title.x  = element_blank(),
+        strip.text.x =  element_text(face = "bold"),
         axis.ticks.x = element_blank(),
-        axis.line.x =  element_blank(),
-        legend.position = "bottom"
+        axis.line.x =  element_blank()
+  #      legend.position = "bottom"
       )
 ggsave(paste(global_var$global$path_microglai_statistics, "fraction_replicates_seperated.png", sep = "/"), p , width = 3.5 , height = 5 , units = "in")
 
