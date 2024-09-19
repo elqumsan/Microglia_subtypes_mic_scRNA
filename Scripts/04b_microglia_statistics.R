@@ -170,7 +170,7 @@ write_delim(aov_table, path = paste( global_var$global$path_microglai_statistics
 #######################   Pseudotime analysis (diffusion map ) 
 ##################### too many cells for diffusion map, need sampling 
 
-integrated.strain$final_clusters <-ifelse(integrated.strain$seurat_clusters %in% 0:0, "H", 
+integrated.strain$final_clusters <-ifelse(integrated.strain$seurat_clusters %in% 8:17, "H", 
        integrated.strain$seurat_clusters %>% as.character())
 
 sampling <- integrated.strain@meta.data %>% 
@@ -192,13 +192,13 @@ rownames(pca)<- cellLables
 
 dm <- DiffusionMap(pca)
 
-dpt <- DPT(dm)
+dpt <- destiny::DPT(dm, tips = c(1,2))
 
 mg.small$pseudotime_dpt <- rank(dpt$dpt)
 
 df <- colData(mg.small) %>% as.data.frame()
 
-df$final_clusters <- ifelse(df$seurat_clusters %in% 0:0, "H", df$seurat_clusters %>% as.character())
+df$final_clusters <- ifelse(df$seurat_clusters %in% 8:17, "H", df$seurat_clusters %>% as.character())
 
 
 ggplot(df, aes(pseudotime_dpt, fill= final_clusters)) +
@@ -212,6 +212,6 @@ ggplot(df, aes(pseudotime_dpt, fill= final_clusters)) +
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         axis.title.y.right = element_blank()
-       
+   #     ,legend.position = "null"
         )
 ggsave(paste(global_var$global$path_microglai_statistics, "pseudotime.png", sep = "/"), width = 3.5 , height = 5.3 , units = "in", dpi = 600)
