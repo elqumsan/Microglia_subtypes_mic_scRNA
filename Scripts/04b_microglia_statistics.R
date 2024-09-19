@@ -118,7 +118,28 @@ aov_Strain_object <- function(cluster, data){
 #### Keep the annova object for 
 aov_object_list <- clusters %>% map(aov_Strain_object,data = integrated.meta.stat)
 names(aov_object_list)<- clusters %>% unlist()
-TukeyHSD(aov_object_list[["H"]]) %>% .$`strain` %>% data.frame(.,cluster= "H")
+stat <- TukeyHSD(aov_object_list[["H"]]) %>% .$`strain` %>% data.frame(.,cluster= "H")
+
+
+###### to export the statistic result:
+
+stat_list <- vector(mode = "list", length = length(clusters %>% unlist()))
+names(stat_list)<- clusters %>% unlist()
+for( i in clusters %>% unlist() ){
+  stat_list[[i]] <- TukeyHSD(aov_object_list[[i]]) %>% .$'strain' %>%
+    data.frame(. , cluster = i ) %>%
+    rownames_to_column(var = "comparison")
+} # end for clusters
+
+stat_all <- do.call(rbind, stat_list)
+
+
+## Find strain differernce of WT (comparing to Veh in for AZT in each strain)
+
+stat_Veh_Azt_cluster <- stat_all %>%
+  filter(str_count(comparison, "AZT-Veh" ) == 2) %>%
+  mutate(Significance = ifelse(p.adj<0.05, "S", "NS"))
+write_delim(stat_Veh_Azt_cluster, paste(global_var$global$path_microglai_statistics, "/stat_Veh_AZT_between_strain.txt", sep = ""), delim = "\t")
 
 ######### check the statistics on nFeature, percent of microglia, and percent of ribosomal genes for each cluster 
 

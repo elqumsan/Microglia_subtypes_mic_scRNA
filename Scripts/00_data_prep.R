@@ -158,4 +158,6 @@ integrated_markers <- integrated_markers %>% rownames_to_column(var = "symbol")
 ## save cell metadata and marker info into rda
 meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 
+
+
 meta_integrated_markers <-merge(meta, y= integrated_markers, add.cell.idec= c("meta", "marker"), Project = "meta_markers"  )
