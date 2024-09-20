@@ -7,6 +7,7 @@ library(stringr)
 library('tidyr')
 library(edgeR)
 library(gridExtra)
+library("scater")
 
 # convert gene names to gene ID in the row name of integrated object
 ## This script is to determine DE gene affected by strain
@@ -70,6 +71,52 @@ singleCell_object <- as.SingleCellExperiment(integrated.strain)
 gridExtra::grid.arrange(plotUMAP(singleCell_object , color_by = "strain", text_by = "seurat_clusters"))
 
 ggsave(paste(global_var$global$path_DE_seq_edgeR,  "SingleCellExper.png", sep ="/"), width = 3.5, height = 5.3 , units = "in" , dpi = 600 )
+
+
+### using 'label' and 'sample' as our two factors; each column of the output 
+### corresponds to one unique combination of these two factors 
+summed <- aggregateAcrossCells(singleCell_object,
+                     id= DataFrame(
+                                    Lable= singleCell_object$seurat_clusters,
+                                   sample = colnames(singleCell_object)))
+
+
+### Below are the testing to make DE gene list for making comparison between the two strains we have 
+
+## Creating up a DGEList object for use in edgeR 
+
+y <- DGEList(counts(summed), samples= colData(summed))
+
+### Statistical Modeling
+y$samples$strain = factor(y$samples$strain, levels = c("Veh", "AZT"))
+
+str(y$samples)
+### Trimmed means of M-values of methods for normalization 
+y <-calcNormFactors(y)
+
+design <- model.matrix(~strain, y$samples)
+
+y <- estimateDisp(y, design )
+
+
+summary(y$trended.dispersion)
+
+plotBCV(y)
+
+fit <- glmQLFit(y, design , robust = TRUE)
+
+summary(fit$var.prior)
+summary(fit$df.prior)
+plotQLDisp(fit)
+
+colnames(coef(fit))
+res <- glmQLFTest(fit, coef = 4)
+summary(decideTests(res))
+
+x <- topTags(res, n=NULL, p.vvalue= 1)
+
+
+
 # plot
 meta_tidy %>%
   ggplot(aes(y=value, x=orig.ident, color=Strain)) +
