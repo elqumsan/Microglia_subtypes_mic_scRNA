@@ -8,6 +8,7 @@ library('tidyr')
 library(edgeR)
 library(gridExtra)
 library("scater")
+library(org.Mm.eg.db) ### add gene names
 
 # convert gene names to gene ID in the row name of integrated object
 ## This script is to determine DE gene affected by strain
@@ -80,19 +81,34 @@ summed <- aggregateAcrossCells(singleCell_object,
                                     Lable= singleCell_object$seurat_clusters,
                                    sample = colnames(singleCell_object)))
 
-
+current <- summed$Lable
 ### Below are the testing to make DE gene list for making comparison between the two strains we have 
 
 ## Creating up a DGEList object for use in edgeR 
 
 y <- DGEList(counts(summed), samples= colData(summed))
 
+#y$genes$Symbol <- mapIds(org.Mm.eg.db, rownames(y), keytype = "ENSEMBL"  ,column = "ENTREZID")
+
+#### remove samples with low library size 
+discarded <- isOutlier(y$samples$lib.size, log = TRUE, type = "lower")
+y <-y[, !discarded]
+summary(discarded)
+
+
+### remove genes that are lowly expressed
+keep <- filterByExpr(y, group = current) ## check group argument when filtering
+y <- y[keep, ]
+
+
+### Trimmed means of M-values of methods for normalization 
+y <-calcNormFactors(y)
+
 ### Statistical Modeling
 y$samples$strain = factor(y$samples$strain, levels = c("Veh", "AZT"))
 
 str(y$samples)
-### Trimmed means of M-values of methods for normalization 
-y <-calcNormFactors(y)
+
 
 design <- model.matrix(~strain, y$samples)
 
@@ -101,87 +117,24 @@ y <- estimateDisp(y, design )
 
 summary(y$trended.dispersion)
 
-plotBCV(y)
+p <- plotBCV(y)
+ggsave(paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), p , width = 3.5, height = 5, units = "in", dpi = 300 )
 
 fit <- glmQLFit(y, design , robust = TRUE)
 
 summary(fit$var.prior)
 summary(fit$df.prior)
+
 plotQLDisp(fit)
+ggsave(paste(global_var$global$path_DE_seq_edgeR, "glmQLFit.png", sep = "/"), width = 3.5, height = 5, units = "in", dpi = 300 )
+
 
 colnames(coef(fit))
-res <- glmQLFTest(fit, coef = 4)
+res <- glmQLFTest(fit, coef = 1)
 summary(decideTests(res))
 
-x <- topTags(res, n=NULL, p.vvalue= 1)
+summary(decideTests(res))
+
+x <- topTags(res, n=NULL, p.value= 1)
 
 
-
-# plot
-meta_tidy %>%
-  ggplot(aes(y=value, x=orig.ident, color=Strain)) +
-  facet_grid(QC ~ Strain, scales = "free_y") +
-  geom_violin() +
-  geom_boxplot(width= 0.15, outlier.shape = NA, alpha = 0.7 ) +
-#  scale_colour_manual(values = cols)
-  theme_bw()+
-  theme(legend.position = "none",
-        axis.title = element_blank(),
-        strip.text = element_text(face = "bold", size = 12, family = "Arial"),
-        axis.title.x = element_text(size = 10),
-        axis.text.x = element_blank(),
-        axis.ticks.x =  element_blank()
-        )
-ggsave(filename = "QC01_merged_integrated.png", path = out_path, width = 3.5, height = 4.5, dpi = 300)
-
-
-##### wrap into function for the following plots
-
-QC_plot <- function(data){
-  
-  strain <- c("Microglia subtypes_WT", "Microglia subtypes_AZT")
-  cols =  c("#888888", "#00AA00")
-  
-  
-  p <- data %>%
-    select(orig.ident,nCount_RNA, nFeature_RNA, Strain) %>%
-    gather(-orig.ident, -Strain ,key= "QC", value="value" )
-    
-    ggplot(aes(y=value, x=orig.ident, color=Strain)) +
-    facet_grid(QC ~ Strain, scales = "free_y") +
-    geom_violin() +
-    geom_boxplot(width= 0.15, outlier.shape = NA, alpha = 0.7 ) +
-    #  scale_colour_manual(values = cols)
-    theme_bw()+
-    theme(legend.position = "none",
-          axis.title = element_blank(),
-          strip.text = element_text(face = "bold", size = 12, family = "Arial"),
-          axis.title.x = element_text(size = 10),
-          axis.text.x = element_blank(),
-          axis.ticks.x =  element_blank()
-    ) 
-  
-    return(p)
-}
-
-
-##### 
-  meta %>%
-  group_by(Strain) %>%
-  summarise(med_nCount_RNA= median(nCount_RNA),
-            med_nFeature_RNA=median(nFeature_RNA),
-            N_cell = n())
-
-
-##### Plot WT/AZT expression levels from single-cell RNA-seq regardless of cluster
-integrated_object$Genotype <- factor(integrated_object@meta.data$Strain, levels = c("WT", "AZT"))
-integrated_object$clusters <- factor(integrated_object$seurat_clusters, levels = c("1","2","3","4","5","6","7"))
-VlnPlot(integrated_object, features = c('P2ry12','Cx3cr1',"Ctss",'Tmem119', "Itgam"), pt.size = 0, split.by = "Genotype")
-theme(legend.position = "right",
-      axis.title = element_blank(),
-      axis.text.x = element_text(size = 10, face = "bold"),
-      axis.text.y = element_text(size = 10),
-      title = element_text(size = 10, family = "Arial")
-      )
-
-ggsave(filename = "QC_Itgam_single_cell_cluster.png", path = out_path, width = 4, height = 2, dpi = 300)
