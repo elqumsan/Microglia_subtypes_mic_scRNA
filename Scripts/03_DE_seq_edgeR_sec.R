@@ -118,15 +118,27 @@ y <- estimateDisp(y, design )
 summary(y$trended.dispersion)
 
 p <- plotBCV(y)
-ggsave(paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), p , width = 3.5, height = 5, units = "in", dpi = 300 )
+
+
+
+ggsave(filename =  paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), print(p),width = 10.5, height = 7)
+
+png("estimateDisp.png")
+print(p)
+dev.off()
+
+ggsave(plot = p,  paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), width = 10.5, height = 7 )
+
 
 fit <- glmQLFit(y, design , robust = TRUE)
 
 summary(fit$var.prior)
 summary(fit$df.prior)
 
-plotQLDisp(fit)
-ggsave(paste(global_var$global$path_DE_seq_edgeR, "glmQLFit.png", sep = "/"), width = 3.5, height = 5, units = "in", dpi = 300 )
+p <- plotQLDisp(fit)
+
+ggsave( plot = p ,paste(global_var$global$path_DE_seq_edgeR, "glmQLFit.png", sep = "/"), width = 3.5, height = 5, units = "in", dpi = 300 )
+dev.off()
 
 
 colnames(coef(fit))
