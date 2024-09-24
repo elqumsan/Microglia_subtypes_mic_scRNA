@@ -67,6 +67,7 @@ library(org.Mm.eg.db) ### add gene names
 DefaultAssay(integrated.strain) <- "RNA"
 singleCell_object <- as.SingleCellExperiment(integrated.strain)
 
+orig.symbol  <- rownames(singleCell_object)
 #rownames(singleCell_object) == EnsembleID$symbol
 
 gridExtra::grid.arrange(plotUMAP(singleCell_object , color_by = "strain", text_by = "seurat_clusters"))
@@ -88,6 +89,9 @@ current <- summed$Lable
 
 y <- DGEList(counts(summed), samples= colData(summed))
 
+### Add gene names
+y$genes$orig_symbol <- orig.symbol
+
 #y$genes$Symbol <- mapIds(org.Mm.eg.db, rownames(y), keytype = "ENSEMBL"  ,column = "ENTREZID")
 
 #### remove samples with low library size 
@@ -99,7 +103,7 @@ summary(discarded)
 ### remove genes that are lowly expressed
 keep <- filterByExpr(y, group = current) ## check group argument when filtering
 y <- y[keep, ]
-
+summary(keep)
 
 ### Trimmed means of M-values of methods for normalization 
 y <-calcNormFactors(y)
