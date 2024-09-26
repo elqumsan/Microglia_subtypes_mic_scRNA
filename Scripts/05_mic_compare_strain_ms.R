@@ -5,6 +5,7 @@ library(tidyverse)
 library(UpSetR)
 library(Seurat)
 library(cowplot)
+library(devtools)
 library(Vennerable)
 library(extrafont)
 
@@ -14,24 +15,24 @@ library(extrafont)
 
 cluster_name <- c("Cluster1", "Cluster2", "Cluster3", "Cluster4", "Cluster5")
 
-strain = c("WT", "AZT")
+strain = c("Veh", "AZT")
 
 
 ##### Microglia markers 
-genes < c("Tem119", "Cx3cr1", "P2ry12", "Sall1", "Gpr34", "Spi1", "Mafb" , "Maf", "Mef2a", "Irf8", "Fcrls" , "0lfm13")
+genes <- c("Tmem119", "Cx3cr1", "P2ry12", "Sall1", "Gpr34", "Spi1", "Mafb" , "Maf", "Mef2a", "Irf8", "Fcrls" )
 Idents(integrated.strain) <- "Strain"
-p <- genes %>% map(~VlnPlot(integrated.strain %>% subset(subset = seurat_clusters), features =. , pt.size = 0 , split.by= "strain" , ncol = 4 
+p <- genes %>% 
+  map(~VlnPlot(integrated_object %>% subset(subset = seurat_clusters %in% c( "8" , "9", "10", "11", "12")), features =. , pt.size = 0 , split.by= "strain" , ncol = 4 
                    , cols = c("#E69F00", "#999999") ) +
                      theme( legend.position = "none",
                             axis.title = element_blank(),
                             axis.text.x =  element_text(size = 8),
                             axis.text.y = element_text(size = 10),
                             title = element_text( size = 10, family = "Arial")
-                       
-                     )
+                     ) )
+
                    
-                   )
-plot_grid(p[[1]], p[[2]], p[[3]],p[[4]], p[[5]],p[[6]], p[[7]],p[[8]], p[[9]], p[[10]], p[[11]], p[[12]],
+plot_grid(p[[1]], p[[2]], p[[3]],p[[4]], p[[5]],p[[6]], p[[7]],p[[8]], p[[9]], p[[10]], p[[11]], 
           align = ("hv"), nrow = 3, ncol = 4)
 
 ggsave(paste(global_var$global$path_compare_strain,"/", "microglia_markers.png", sep = "" ), 
@@ -41,9 +42,13 @@ ggsave(paste(global_var$global$path_compare_strain,"/", "microglia_markers.png",
 ### Z-score plotting using split violin and grouped by cluster 
 inpalette  <- c("#999999", "#E69F00", "#56B4E9", "#009E73" ,"#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-cluster <- c("1", "2","3")
-strain <- c("WT", "AZT")
+cluster <- c("8" , "9", "10", "11", "12")
+strain <- c("Veh", "AZT")
 width_height <- c(3,5)
+
+
+
+
 
 ## Find cluster markers
 meta <- integrated.strain@meta.data %>% select(-starts_with("ribo_"))

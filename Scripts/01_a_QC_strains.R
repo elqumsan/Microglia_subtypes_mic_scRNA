@@ -193,3 +193,18 @@ gene_list <- markers_top %>% filter(cluster == 11) %>% select(symbol) %>% unlist
 results= CMenrich(gene.list = gene_list, species = 'mouse')
 DT::datatable(results$enrichments)
 results$genes[[1]]
+
+##########################################
+### QC plot in the microglia cell that has already passed QC. 
+png(filename = paste(global_var$global$Path_QC_Strain_findings, "QC_plot_microglia.png", sep="") )
+p <- ggplot(integrated_object@meta.data, aes(x= nCount_RNA, y= nFeature_RNA)) + geom_point(alpha= 0.5, size=0.5) + theme_classic()
+ggExtra::ggMarginal(p , type = "histogram", xparams = list(fill= "yellow"), yparams = list(fill = "blue"))
+dev.off()
+
+DimPlot(integrated.strain, reduction = "umap", label = TRUE, pt.size = 0.001)
+coord_fixed()
+
+#p <- ggplot(integrated.strain@meta.data, aes(x= nCount_RNA, y= nFeature_RNA)) + geom_point(alpha= 0.5, size=0.5) + theme_classic()
+#ggExtra::ggMarginal(p , type = "histogram", xparams = list(fill= "yellow"), yparams = list(fill = "blue"))
+
+
