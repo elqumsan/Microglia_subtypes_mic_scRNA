@@ -141,8 +141,8 @@ png(filename = paste(global_var$global$path_DE_seq_edgeR, "PlotQLDisp.png", sep=
 p <- plotQLDisp(fit)
 dev.off()
 
-ggsave( plot = p ,paste(global_var$global$path_DE_seq_edgeR, "glmQLFit.png", sep = "/"), width = 3.5, height = 5, units = "in", dpi = 300 )
-dev.off()
+#ggsave( plot = p ,paste(global_var$global$path_DE_seq_edgeR, "glmQLFit.png", sep = "/"), width = 3.5, height = 5, units = "in", dpi = 300 )
+#dev.off()
 
 
 colnames(coef(fit))
