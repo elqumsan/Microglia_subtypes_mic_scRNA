@@ -153,4 +153,4 @@ summary(decideTests(res))
 
 x <- topTags(res, n=NULL, p.value= 1)
 
-
+write_delim(x$table, paste(global_var$global$path_DE_seq_edgeR, "glmQLFTest.txt", sep="/"), delim = "\t")
