@@ -81,8 +81,8 @@ summed <- aggregateAcrossCells(singleCell_object,
                      id= DataFrame(
                                     Lable= singleCell_object$seurat_clusters,
                                    sample = colnames(singleCell_object)))
-
-current <- summed$Lable
+#label = c("0","1", "2","3","4", "5", "6", "7", "8")
+#current <- summed[, label == summed$Lable]
 ### Below are the testing to make DE gene list for making comparison between the two strains we have 
 
 ## Creating up a DGEList object for use in edgeR 
@@ -101,8 +101,8 @@ summary(discarded)
 
 
 ### remove genes that are lowly expressed
-keep <- filterByExpr(y, group = current) ## check group argument when filtering
-y <- y[keep, ]
+keep <- filterByExpr(y, group = summed$strain) ## check group argument when filtering
+y <- y$genes[keep ]
 summary(keep)
 
 ### Trimmed means of M-values of methods for normalization 
@@ -116,22 +116,20 @@ str(y$samples)
 
 design <- model.matrix(~strain, y$samples)
 
-y <- estimateDisp(y, design )
+#y <- estimateDisp(y, design, trend.method = "none", subset = 5000 )
+
+y <- estimateDisp(y )
 
 
 summary(y$trended.dispersion)
 
+png(filename = paste( global_var$global$path_DE_seq_edgeR,  "PlotBCV.png", sep= "/"))
 p <- plotBCV(y)
-
-
-
-ggsave(filename =  paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), print(p),width = 10.5, height = 7)
-
-png("estimateDisp.png")
-print(p)
 dev.off()
 
-ggsave(plot = p,  paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), width = 10.5, height = 7 )
+
+# ggsave(filename =  paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), print(p),width = 10.5, height = 7)
+# ggsave(plot = p,  paste(global_var$global$path_DE_seq_edgeR, "estimateDisp.png", sep = "/"), width = 10.5, height = 7 )
 
 
 fit <- glmQLFit(y, design , robust = TRUE)
@@ -139,7 +137,9 @@ fit <- glmQLFit(y, design , robust = TRUE)
 summary(fit$var.prior)
 summary(fit$df.prior)
 
+png(filename = paste(global_var$global$path_DE_seq_edgeR, "PlotQLDisp.png", sep= "/") )
 p <- plotQLDisp(fit)
+dev.off()
 
 ggsave( plot = p ,paste(global_var$global$path_DE_seq_edgeR, "glmQLFit.png", sep = "/"), width = 3.5, height = 5, units = "in", dpi = 300 )
 dev.off()
