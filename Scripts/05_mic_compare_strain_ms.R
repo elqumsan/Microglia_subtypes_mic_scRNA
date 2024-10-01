@@ -41,12 +41,26 @@ ggsave(paste(global_var$global$path_compare_strain,"/", "microglia_markers.png",
 
 ### Z-score plotting using split violin and grouped by cluster 
 inpalette  <- c("#999999", "#E69F00", "#56B4E9", "#009E73" ,"#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
-cluster <- c("8" , "9", "10", "11", "12")
+comp <- "homeo1"
+cluster <- c("0","1","2","3","4","5","6" ,"7", "H" ,"8" , "9", "10", "11", "12", "13", "14","15")
 strain <- c("Veh", "AZT")
 width_height <- c(3,5)
 
-
+integrated.strain@meta.data %>% 
+  filter( integrated.strain$final_clusters %in% cluster  ) %>%
+  mutate(final_clusters = factor(integrated.strain$final_clusters, levels = cluster),
+         strain = factor(strain, levels = strain)) %>%
+  ggplot(aes(y= "homeo1", x=strain, fill= strain)) + #change y to the same comp but no quotation mark
+     facet_grid( integrated.strain$final_clusters ~ . , scales = "fixed") +
+ introdataviz::geom_split_violin( trim = TRUE) +
+  geom_boxplot(width = 0.25, notch =  FALSE, notchwidth = .4 , outlier.shape = NA , coef= 0) +
+  scale_fill_manual(values = inpalette) +
+  
+  coord_flip() +
+  theme_bw() +
+  labs(x=NULL,  y = "z-score") +
+  theme(legend.position = "bottom",
+        )
 
 
 
