@@ -93,6 +93,11 @@ plot_grid(p[[1]], p[[2]], p[[3]], p[[4]], p[[5]], p[[6]], p[[7]], p[[8]], p[[9]]
 
 ######################################
 
+### Upset plot 1 :
+DE_cluster_list 
+
+####################
+
 meta <- integrated.strain@meta.data %>% select(-starts_with("ribo_"))
 head(integrated_markers)
 sample_IDs<- colnames(integrated.strain)
@@ -106,6 +111,7 @@ head(final_meta)
 #### set up marker gene sets for each cluster
 cluster_name <- c("Cluster1", "Cluster20", "Cluster21", "Cluster22")
 strain= c("WT", "AZT")
+integrated_object <- JoinLayers(integrated_object)
 marker_genes<-  FindAllMarkers(integrated_object, only.pos = FALSE, min.pct = 0.25, logfc.threshold = 0.25, max.cells.per.ident = 300)
 marker_genes <- marker_genes %>% rownames_to_column(var = "symbol")
 marker_genes <- marker_genes %>% group_by(cluster) %>% top_n(n=10, wt= p_val_adj) # do not put quotation mark on the wt argument #  sho top markers 
@@ -122,7 +128,7 @@ cluster_DE <- function(logFDR_cut, logFC_cut, df){
   # output:
   # a list containing marker genes for a given cluster for all strains
   # strain: global environment
-  DE_list <- vector(mode = "list", length = length(summed))
+  DE_list <- vector(mode = "list", length = length(strain))
 
   # df: DE gene table for each cluster 
   # output:
