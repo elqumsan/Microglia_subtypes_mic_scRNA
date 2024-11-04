@@ -50,8 +50,12 @@ ggsave(paste(global_var$global$path_microglia_clustering, "/", "Dimplot_integart
 ######### Dot Plot of microglia marker genes for each clusters 
 
 #Idents(integrated.strain) <- "final_clusters"
- genes <- c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24" 
-           , "C3ar1", "Stmn1", "Top2a", "Birc5" ) 
+# genes <- c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24" 
+#           , "C3ar1", "Stmn1", "Top2a", "Birc5" ) 
+ 
+ genes <- c("Cx3cr1", "Tmem119", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24", "Apoe" , "Nos2", "Tspo", "Cd14" , "Cd86" , "Cd16", "Cd32", 
+            "Cd40", "IL6" , "IL12", "IL18", "Mmp9", "Mmp2", "Tnfrsf1a", "Ccl5", "Ccl10", "Cxcl1", "Cxcl9","Cxcl10",
+            "Arg1", "IL4", "IL10", "IL13", "Ccl2", "Ccl17", "Ccl22", "Ccl24", "Ym1", "Fizz1", " Cd163", "Cd206", "Tgfb1",)
  
  file_name <- paste(global_var$global$path_microglia_clustering, "/Dotplot_all_gene.png", sep = "")
  DotPlot(integrated.strain, features = genes) + RotatedAxis() +

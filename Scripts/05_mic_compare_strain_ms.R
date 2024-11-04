@@ -22,7 +22,7 @@ strain = c("Veh", "AZT")
 genes <- c("Tmem119", "Cx3cr1", "P2ry12", "Sall1", "Gpr34", "Spi1", "Mafb" , "Maf", "Mef2a", "Irf8", "Fcrls" )
 Idents(integrated.strain) <- "Strain"
 p <- genes %>% 
-  map(~VlnPlot(integrated_object %>% subset(subset = seurat_clusters %in% c( "8" , "9", "10", "11", "12")), features =. , pt.size = 0 , split.by= "strain" , ncol = 4 
+  map(~VlnPlot(integrated_object %>% subset(subset = seurat_clusters %in% c("0", "1", "2" , "11", "12")), features =. , pt.size = 0 , split.by= "strain" , ncol = 4 
                    , cols = c("#E69F00", "#999999") ) +
                      theme( legend.position = "none",
                             axis.title = element_blank(),
