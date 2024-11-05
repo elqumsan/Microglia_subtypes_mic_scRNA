@@ -81,6 +81,12 @@ integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, f
 integrated_object[["percent.mt"]] <- PercentageFeatureSet(integrated_object, pattern = "^MT-")
 
 
+##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
+
+integrated.strain.mocroglia <- subset(x = integrated.strain,idents=c(8,15))
+integrated.strain.mocroglia <- subset(x = integrated.strain, subset = Ctss > 1)
+
+
 ## Check cell type for some cluster (check selected cluster, don't need to check all)
 
 results = CMenrich(gene.list = c('Sall1', 'Hexb', 'Fcrls', 'Gpr43', 'Cx3cr1', 'Tmem119', 'Trem2', 'P2ry12', 'Mertk', 'Pros1','Siglech'), species = 'mouse' )
@@ -118,7 +124,7 @@ cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))
 integrated_object <-AddMetaData(integrated_object, cellsMetaTrim)
 head(integrated_object)
 
-VlnPlot(integrated_object, c("nCount_RNA", "Gene_IDs"), ncol = 2)
+VlnPlot(integrated_object, c("nCount_RNA", "percent.microglia"), ncol = 2)
 ggsave(paste(global_var$global$path_microglia_integration, "volcano", ".png", sep = ""), units = "in", width = 10, height = 5, dpi= 200)
 
 DimPlot(integrated_object, group.by = c("orig.ident", "seurat_clusters"))
@@ -136,6 +142,7 @@ ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_Ve
 
 #integrated_object <-RunUMAP(integrated_object, dims = 1:30)
 
+#azt_v_all_markers<-FindMarkers(object = integrated_object,ident.1 = c(0,1,2,3),assay = "RNA")
 
 #meta.all <- integrated_object %>% 
 #  dplyr::rename(Integrated_object = "integrated_object")  %>%
