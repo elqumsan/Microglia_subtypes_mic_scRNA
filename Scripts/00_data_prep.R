@@ -63,6 +63,11 @@ integrated_object$strain <- str_replace(integrated_object$strain, pattern ="Micr
 #sample_ID <- colnames(integrated_object)
 #meta_data <- data_frame(Sample_ID = sample_ID,Cust_ID ,Strain = integrated_object$Strain )
 
+##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
+
+integrated_object <- subset(x = integrated_object,idents=c(0, 1 ,2 ,3 , 6 ,12 , 14, 17))
+integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
+
 
 meta <- integrated_object@meta.data
 
@@ -79,12 +84,6 @@ integrated_object$percent.ribo <- PercentageFeatureSet(integrated_object, featur
 microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "Trem2","P2ry12" ,"Cd81" ,"Cst3","Cst7", "Mertk", "Pros1","Siglech", "Sall1", "Hexb", "Fcrls" ) 
 integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list )
 integrated_object[["percent.mt"]] <- PercentageFeatureSet(integrated_object, pattern = "^MT-")
-
-
-##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
-
-integrated.strain.mocroglia <- subset(x = integrated.strain,idents=c(8,15))
-integrated.strain.mocroglia <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
 ## Check cell type for some cluster (check selected cluster, don't need to check all)
@@ -107,7 +106,6 @@ integrated_object<- integrated_object %>%
 #### integrated.strain object has no layers, all layers have been merged to be eligible for the rest analysis 
 integrated.strain <- integrated_object
 integrated.strain <- JoinLayers(integrated.strain)
-
 
 
 #######
@@ -149,6 +147,8 @@ ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_Ve
 #  select(ID_prefix, sample_ID, Cust_ID, Exp_batch)
 
 ##############################################
+integrated.strain <- integrated.strain.microglia
+
 
 integrated.clusters <- AddModuleScore(object = integrated.strain, features = microglia.gene.list, ctrl = 100, name = 'Microgial Features')
 
