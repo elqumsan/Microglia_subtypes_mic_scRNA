@@ -63,10 +63,6 @@ integrated_object$strain <- str_replace(integrated_object$strain, pattern ="Micr
 #sample_ID <- colnames(integrated_object)
 #meta_data <- data_frame(Sample_ID = sample_ID,Cust_ID ,Strain = integrated_object$Strain )
 
-##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
-
-integrated_object <- subset(x = integrated_object,idents=c(0, 1 ,2 ,3 , 6 ,12 , 14, 17))
-integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
 meta <- integrated_object@meta.data
@@ -147,7 +143,7 @@ ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_Ve
 #  select(ID_prefix, sample_ID, Cust_ID, Exp_batch)
 
 ##############################################
-integrated.strain <- integrated.strain.microglia
+integrated.strain <- integrated.strain
 
 
 integrated.clusters <- AddModuleScore(object = integrated.strain, features = microglia.gene.list, ctrl = 100, name = 'Microgial Features')
@@ -165,6 +161,11 @@ integrated_markers <- integrated_markers %>% rownames_to_column(var = "symbol")
 ## save cell metadata and marker info into rda
 meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 
+
+##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
+
+integrated_object <- subset(x = integrated_object,idents=c(0, 1 ,2 ,3 , 6 ,12 , 14, 17))
+integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
 meta_integrated_markers <-merge(meta, y= integrated_markers, add.cell.idec= c("meta", "marker"), Project = "meta_markers"  )
