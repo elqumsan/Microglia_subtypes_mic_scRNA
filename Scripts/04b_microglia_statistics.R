@@ -48,7 +48,7 @@ ggsave(paste(global_var$global$path_microglai_statistics, "fraction_replicates_s
 ############ generate meta data, for statistical testing and box plot 
 integrated.meta.stat <- mg.strain@meta.data %>%
                 mutate( strain=factor(strain, levels = c("Veh", "AZT")),
-                        new_clusters = ifelse(seurat_clusters %in% 8:17 , "H", as.character(seurat_clusters)),
+                        new_clusters = ifelse(seurat_clusters %in% 8:19 , "H", as.character(seurat_clusters)),
                         new_clusters=factor(new_clusters, levels = c("0","1","2","3","4","5","6", "7", "H"))) %>%
                 group_by(strain, new_clusters) %>%
                 summarise(Med_nFeature=median(nFeature_RNA),
