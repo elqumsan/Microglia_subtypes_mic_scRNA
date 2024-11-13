@@ -90,13 +90,13 @@ results = CMenrich(gene.list = c('Sall1', 'Hexb', 'Fcrls', 'Gpr43', 'Cx3cr1', 'T
 ##################################
 pca_dim = 11
 integrated_object<- integrated_object %>% 
-                      NormalizeData() %>%
-                      FindVariableFeatures(selection.method = "vst", nfeatures = 3000) %>%
-                      ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
-                      RunPCA() %>%
-                      RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
-                      FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%
-                      FindClusters(resolution = c(0.5 ,0.6, 0.7, 0.8 ))
+  NormalizeData() %>%
+  FindVariableFeatures(selection.method = "vst", nfeatures = 3000) %>%
+  ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
+  RunPCA() %>%
+  RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
+  FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%
+  FindClusters(resolution = c(0.5 ,0.6, 0.7, 0.8 ))
 
 
 #### integrated.strain object has no layers, all layers have been merged to be eligible for the rest analysis 
@@ -104,14 +104,42 @@ integrated.strain <- integrated_object
 integrated.strain <- JoinLayers(integrated.strain)
 
 
-#######
+############ This step is just to pick Microglia cells that are located in clusters 12, 5, 8, 9, 10, 11 ,13,  14 , 15, 
+############ consequence performing the analysis on it  
+VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
+        group.by = "seurat_clusters")
 
+ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
+
+
+
+integrated_object <- subset(x = integrated_object,idents=c(5 , 8, 9 , 10, 11 , 12, 13, 14, 15))
+#integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
+
+
+##################################
+pca_dim = 11
+integrated_object<- integrated_object %>% 
+  NormalizeData() %>%
+  FindVariableFeatures(selection.method = "vst", nfeatures = 3000) %>%
+  ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
+  RunPCA() %>%
+  RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
+  FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%
+  FindClusters(resolution = c(0.5 ,0.6, 0.7, 0.8 ))
+
+
+#### integrated.strain object has no layers, all layers have been merged to be eligible for the rest analysis 
+integrated.strain <- integrated_object
+integrated.strain <- JoinLayers(integrated.strain)
+
+#########
 mg.strain <-what_dims(object_type = integrated_object, path = global_var$global$Path_QC_Strain_findings, strain = global_var$global$strain , round = global_var$global$round  )
 
 cells <- WhichCells(integrated_object)
 
 CellsMeta = integrated_object@meta.data
-randomnumbers <- runif(25167, 0.0, 1.1)
+randomnumbers <- runif(4269, 0.0, 1.1)
 CellsMeta["Gene_IDs"] <- randomnumbers
 head(CellsMeta)
 cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))
@@ -162,29 +190,6 @@ integrated_markers <- integrated_markers %>% rownames_to_column(var = "symbol")
 ## save cell metadata and marker info into rda
 meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 
-
-##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
-
-
-integrated_object <- subset(x = integrated_object,idents=c(5 , 8, 9 , 10, 11 , 12, 15))
-
-integrated.anchors <- subset(x = integrated.anchors, idents=   c(5 , 8, 9 , 10, 11 , 12, 15))
-integrated.clusters <- subset(x= integrated.clusters, idents = c(5 , 8, 9 , 10, 11 , 12, 15))
-integrated.strain <- subset(x= integrated.strain, idents =     c(5 , 8, 9 , 10, 11 , 12, 15))
-integrated.merged$Veh <- subset(x = integrated.merged$Veh , idents =  c(5 , 8, 9 , 10, 11 , 12, 15))
-integrated.merged$AZT <- subset(x= integrated.merged$AZT, idents= c(5 , 8, 9 , 10, 11 , 12, 15))
-mg.strain <-subset(x= mg.strain, idents= c(5 , 8, 9 , 10, 11 , 12, 15))
-
-#integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
-
-
-VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
-        group.by = "seurat_clusters")
-
-ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
-
-integrated_object <- subset(x = integrated_object,idents=c(0, 1 ,2 ,3 , 6 ,12 , 14, 17))
-integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
 
