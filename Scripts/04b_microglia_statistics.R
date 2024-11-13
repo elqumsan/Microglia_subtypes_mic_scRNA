@@ -27,6 +27,19 @@ integrated.meta <- mg.strain@meta.data %>%
   arrange(strain) %>%
   summarise(N=n())
 
+
+
+integrated.meta <- mg.strain@meta.data %>%
+  mutate(strain = factor(strain, levels = c("Veh","AZT")),
+        new_clusters= ifelse(seurat_clusters %in% c(5,8, 10, 12), "M" ,as.character(seurat_clusters)),
+         # new_clusters= ifelse(seurat_clusters %in% 0:0, "H" ,as.character(seurat_clusters)),
+         new_clusters=factor(new_clusters, levels = c( "5", "8", "10", "12"))) %>%
+  group_by(strain , new_clusters) %>%
+  arrange(strain) %>%
+  summarise(N=n())
+
+
+
 p <- ggplot(integrated.meta, aes(y=N, x=strain , fill= new_clusters )) +
       geom_bar(stat = "identity", position = "fill", color= "black") + 
       labs(y="Fraction", fill = "Clusters") +

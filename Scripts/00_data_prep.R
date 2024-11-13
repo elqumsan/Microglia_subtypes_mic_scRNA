@@ -165,6 +165,7 @@ meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 
 ##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
 
+
 integrated_object <- subset(x = integrated_object,idents=c(5 , 8, 9 , 10, 11 , 12, 15))
 
 integrated.anchors <- subset(x = integrated.anchors, idents=   c(5 , 8, 9 , 10, 11 , 12, 15))
@@ -181,6 +182,10 @@ VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "
         group.by = "seurat_clusters")
 
 ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
+
+integrated_object <- subset(x = integrated_object,idents=c(0, 1 ,2 ,3 , 6 ,12 , 14, 17))
+integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
+
 
 
 meta_integrated_markers <-merge(meta, y= integrated_markers, add.cell.idec= c("meta", "marker"), Project = "meta_markers"  )
