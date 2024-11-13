@@ -117,7 +117,7 @@ DotPlot(integrated.strain, features = genes) + RotatedAxis() +
 ggsave(paste(global_var$global$path_microglia_clustering, "/Dotplot_IEG.png", sep = ""), units = "in", width = 6.1, height = 3.4, dpi = 300 )
 
 
-###### Check the gene number, percent of percent of mitochodrial and microglia genes genes in each cluster 
+###### Check the gene number, percent of percent of mitochodrial and microglia genes in each cluster 
 
 
 QC_plot_single2 <- function(data , y ){
@@ -135,3 +135,10 @@ p <- plot_grid(plotlist = p_QC, nrow = 3, ncol = 1 , align = "hv")
 plot_grid(p, nrow = 1, rel_heights = c(0.1, 1))
 
 ggsave(paste(global_var$global$path_microglia_clustering, "/all_microglia_integrated2.png", sep = ""), units = "in", width = 4.5, height = 3.5, dpi = 300)
+
+
+VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
+        group.by = "seurat_clusters")
+
+ggsave(paste(global_var$global$path_microglia_clustering, "/percent_of_microG_in_each_cluster.png", sep = ""), units = "in", width = 4.5, height = 3.5 ,
+       dpi = 300)
