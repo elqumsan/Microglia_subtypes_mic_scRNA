@@ -119,10 +119,10 @@ integrated_object <-AddMetaData(integrated_object, cellsMetaTrim)
 head(integrated_object)
 
 VlnPlot(integrated_object, c("nCount_RNA", "percent.microglia"), ncol = 2)
-ggsave(paste(global_var$global$path_microglia_integration, "volcano", ".png", sep = ""), units = "in", width = 10, height = 5, dpi= 200)
+ggsave(paste(global_var$global$path_data_prep, "volcano.png",  sep = "/"), units = "in", width = 10, height = 5, dpi= 200)
 
 DimPlot(integrated_object, group.by = c("orig.ident", "seurat_clusters"))
-ggsave(paste(global_var$global$path_microglia_integration, "cluster_for_AZT_&_Veh", ".png", sep = ""), units = "in", width = 10, height = 5, dpi = 200)
+ggsave(paste(global_var$global$path_data_prep, "cluster_for_AZT_&_Veh.png", sep = "/"), units = "in", width = 10, height = 5, dpi = 200)
 
 #integrated_object[["RNA"]] <- split( integrated_object[["RNA"]] ,f =  integrated_object$seurat_clusters )
 #################
@@ -158,14 +158,29 @@ integrated_markers <-FindAllMarkers(integrated.strain, only.pos = TRUE, min.pct 
 integrated_markers <- integrated_markers %>% rownames_to_column(var = "symbol")
 
 
+
 ## save cell metadata and marker info into rda
 meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 
 
 ##### To pick up a bit microglia genes and then whole dataset would be microglia-wide genes 
 
-integrated_object <- subset(x = integrated_object,idents=c(0, 1 ,2 ,3 , 6 ,12 , 14, 17))
-integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
+integrated_object <- subset(x = integrated_object,idents=c(5 , 8, 9 , 10, 11 , 12, 15))
+
+integrated.anchors <- subset(x = integrated.anchors, idents=   c(5 , 8, 9 , 10, 11 , 12, 15))
+integrated.clusters <- subset(x= integrated.clusters, idents = c(5 , 8, 9 , 10, 11 , 12, 15))
+integrated.strain <- subset(x= integrated.strain, idents =     c(5 , 8, 9 , 10, 11 , 12, 15))
+integrated.merged$Veh <- subset(x = integrated.merged$Veh , idents =  c(5 , 8, 9 , 10, 11 , 12, 15))
+integrated.merged$AZT <- subset(x= integrated.merged$AZT, idents= c(5 , 8, 9 , 10, 11 , 12, 15))
+mg.strain <-subset(x= mg.strain, idents= c(5 , 8, 9 , 10, 11 , 12, 15))
+
+#integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
+
+
+VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
+        group.by = "seurat_clusters")
+
+ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
 
 meta_integrated_markers <-merge(meta, y= integrated_markers, add.cell.idec= c("meta", "marker"), Project = "meta_markers"  )

@@ -9,6 +9,7 @@ global: ## Global parameters are those who are the same across all study cases
   AZTdata.path: "/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/"
   AZT_Project:  "AZT_data_Microglia"
   path_out: "../Microglia_subtypes_mic_scRNA/findings/"
+  path_data_prep: "../Microglia_subtypes_mic_scRNA/findings/00_data_prep"
   Path_QC_Strain_findings: "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/"
   path_microglai_statistics: "../Microglia_subtypes_mic_scRNA/findings/04b_microglia_statistics"
   path_microglia_clustering: "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering"
