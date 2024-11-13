@@ -37,10 +37,10 @@ integrated_markers %>% group_by(cluster) %>% top_n(-10, wt = p_val_adj)
 # Idents(integrated.strain) <- "final_clusters"
 
 p <- DimPlot(integrated.strain, reduction = "umap", label = TRUE, pt.size = 1E-10, split.by = "strain", ncol = 2, label.size = 3 , repel = TRUE ) +
-  ggtitle(label = paste("AZT agnaist WT Clustering"))
+  ggtitle(label = paste("AZT agnaist WT Clustering")) +
   coord_fixed() +
-  theme(title = element_text(size = 3),
-        axis.text =  element_text(size = 6),
+  theme(title = element_text(size = 18),
+        axis.text =  element_text(size = 12),
         legend.position = "none")
 
 ggsave(paste(global_var$global$path_microglia_clustering, "/", "Dimplot_integarted_data.png", sep = "" ), p , dpi = 300)
