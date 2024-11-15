@@ -139,7 +139,7 @@ mg.strain <-what_dims(object_type = integrated_object, path = global_var$global$
 cells <- WhichCells(integrated_object)
 
 CellsMeta = integrated_object@meta.data
-randomnumbers <- runif(25167, 0.0, 1.1)
+randomnumbers <- runif(4269, 0.0, 1.1)
 CellsMeta["Gene_IDs"] <- randomnumbers
 head(CellsMeta)
 cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))
@@ -151,6 +151,9 @@ ggsave(paste(global_var$global$path_data_prep, "volcano.png",  sep = "/"), units
 
 DimPlot(integrated_object, group.by = c("orig.ident", "seurat_clusters"))
 ggsave(paste(global_var$global$path_data_prep, "cluster_for_AZT_&_Veh.png", sep = "/"), units = "in", width = 10, height = 5, dpi = 200)
+
+
+
 
 #integrated_object[["RNA"]] <- split( integrated_object[["RNA"]] ,f =  integrated_object$seurat_clusters )
 #################
@@ -189,6 +192,12 @@ integrated_markers <- integrated_markers %>% rownames_to_column(var = "symbol")
 
 ## save cell metadata and marker info into rda
 meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
+
+
+VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
+        group.by = "seurat_clusters")
+
+ggsave(paste(global_var$global$path_microglia_clustering, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
 
 

@@ -16,51 +16,18 @@ library(org.Mm.eg.db) ### add gene names
 # Bench mark DE gene analysis identified EdgeR QFT as one of the top methods  https://www.nature.com/articles/nmeth.4612
 
 
-#out_path <- "../Microglia_subtypes_mic_scRNA-/findings/02_QC_strain_split/"
+### Single cell RNAseq is notorious for having a normal distribution for gene expression
+# scRNAseq has a trasnscript recovery rate between 60%-80%
 
-#Wtdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
-#WT_Project <- "WT_data_Microglia"
-#AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
-#AZT_Project <-  "AZT_data_Microglia"
+png(filename = paste( global_var$global$path_DE_seq_edgeR,  "density_of_Graph_2500_randome_cells.png", sep ="/"))
 
-#WTdata  <- Read10X(data.dir = Wtdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
-#AZTdata <- Read10X(data.dir = AZTdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
-#WT_object <-  CreateSeuratObject(counts = WTdata, project = "Microglia subtypes_WT", min.cells = 3, min.features = 300)
-#AZT_object <- CreateSeuratObject(counts = AZTdata, project = "Microglia subtypes_AZT", min.cells = 3, min.features = 300)
+plot(density(sample(JoinLayers(integrated_object@assays$RNA)$count["Gapdh",],2500)),cex=0,lty=1, main="Density of Gapdh in 2500 random cells")
+dev.off()
 
-#integrated_object <-  merge(WT_object, y = AZT_object, add.cell.ids = c("WT", "AZT"), merge.data= TRUE)
+png(filename = paste( global_var$global$path_DE_seq_edgeR,  "Histogram_of_graph.png", sep ="/"))
+hist(sample(JoinLayers(integrated_object@assays$RNA)$count["Gapdh",],2500),breaks=99,main="Histogram of Gapdh in 2500 random cells",ylab="Frequency",xlab="Gene counts")
+dev.off()
 
-#integrated_object <- integrated_object %>% NormalizeData()  %>% FindVariableFeatures()  %>% ScaleData()  %>% RunPCA() %>% 
-#                   FindNeighbors(dims = 1:30 , reduction = "pca") %>%
-#                   FindClusters(resolution = 0.05) 
-  
-
-
-  
-              
-# integrated_object <-integrated_object %>% RunUMAP(dims = 1:30 , reduction.name = "umap")
-
-
-
-#integrated_object <- RunPCA(integrated_object)
-#integrated_object <-FindNeighbors(integrated_object, dims = 1:30)
-#cluster_object <- FindClusters(integrated_object,resolution = 0.05)
-
-#strain <- c("Microglia subtypes_WT", "Microglia subtypes_AZT")
-#cols =  c("#888888", "#00AA00")
-
-#integrated_object[["Strain"]] <- factor(integrated_object@meta.data$orig.ident, levels = strain)
-#integrated_object$Strain <- str_replace(integrated_object$Strain,pattern = "Microglia subtypes_WT", replacement = "WT" )
-#integrated_object$Strain <- str_replace(integrated_object$Strain, pattern ="Microglia subtypes_AZT", replacement = "AZT" )
-#meta <- integrated_object@meta.data
-#dim(meta)
-#head(meta)
-
-#meta_tidy <- meta %>% 
-#  select(orig.ident,nCount_RNA, nFeature_RNA, Strain) %>%
-#  gather(-orig.ident, -Strain ,key= "QC", value="value" )
-
-#head(meta_tidy)
 
 
 ### convert to single cell experiment
