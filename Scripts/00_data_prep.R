@@ -111,7 +111,8 @@ VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "
 
 ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
-
+#########  This step to get just Microglia cells from whole integrated data sets 
+######### Cells filtering to just having Microglia cells in whole datasets
 
 integrated_object <- subset(x = integrated_object,idents=c(5 , 8, 9 , 10, 11 , 12, 13, 14, 15))
 #integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
