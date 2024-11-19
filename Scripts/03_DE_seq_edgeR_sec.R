@@ -29,6 +29,23 @@ hist(sample(JoinLayers(integrated_object@assays$RNA)$count["Gapdh",],2500),break
 dev.off()
 
 
+#########
+dim(integrated_markers)
+integrated_markers <- integrated_markers[integrated_markers$p_val_adj < 0.05,]
+integrated_markers <- integrated_markers[order(integrated_markers$avg_log2FC, decreasing = T ), ]
+
+png(filename = paste(global_var$global$path_DE_seq_edgeR, "Heatmap.png", sep = "/"))
+
+DoHeatmap(object = integrated.strain, features = (integrated_markers$gene[1:50]), group.by = "strain", slot = "data", assay = "RNA")
+dev.off()
+
+png(filename = paste(global_var$global$path_DE_seq_edgeR, "DimHeatmap.png" , sep = "/"))
+DimHeatmap(integrated.strain, dims = 1:9, cells = 500 , balanced = TRUE, ncol = 3)
+dev.off()
+
+png(filename = paste(global_var$global$path_DE_seq_edgeR, "FeaturePlot.png", sep = "/" ))
+FeaturePlot(object = integrated.strain, features = head( integrated_markers$gene ))
+dev.off()
 
 ### convert to single cell experiment
 DefaultAssay(integrated.strain) <- "RNA"
