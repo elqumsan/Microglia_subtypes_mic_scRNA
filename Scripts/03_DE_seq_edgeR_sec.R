@@ -48,6 +48,7 @@ FeaturePlot(object = integrated.strain, features = head( integrated_markers$gene
 dev.off()
 
 
+
 ##### Feature selection for following heterogeneity analysis
 feature_variable <- FindVariableFeatures(integrated.strain, nfeatures = 3000)
 top_feature <- head(VariableFeatures(feature_variable), 20)
@@ -56,6 +57,7 @@ plot1 <- VariableFeaturePlot(feature_variable)
 plot2 <- LabelPoints(plot = plot1 , points = top_feature, repel = TRUE)
 x <- plot1 + plot2
 ggsave(filename = paste(global_var$global$path_DE_seq_edgeR, "heterogeneity_analysis.png", sep = "/"), units = "in" , width = 10, height = 5, dpi = 300 )
+
 
 
 ### convert to single cell experiment
