@@ -60,6 +60,17 @@ ggsave(filename = paste(global_var$global$path_DE_seq_edgeR, "heterogeneity_anal
 
 
 
+########## Non-linear dimension reduction for visualization 
+object1 <- RunTSNE(integrated.strain, dims = 1:20)
+object2 <- RunUMAP(integrated.strain, dims = 1:20)
+
+plot1 <- TSNEPlot(object1)
+plot2 <-UMAPPlot(object2)
+
+plot1 + plot2
+
+ggsave(filename = paste(global_var$global$path_DE_seq_edgeR, "tSNE_UMAP_plot.png", sep = "/"), units = "in", width = 10, height = 5, dpi = 300 )
+
 ### convert to single cell experiment
 DefaultAssay(integrated.strain) <- "RNA"
 singleCell_object <- as.SingleCellExperiment(integrated.strain)
