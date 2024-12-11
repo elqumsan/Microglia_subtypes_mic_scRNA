@@ -48,7 +48,7 @@ top10_cl_markers <- cl_markers %>% group_by(cluster) %>% top_n(n=10, wt = avg_lo
 DoHeatmap(integrated.strain, features = top10_cl_markers$gene) + NoLegend()
 
 plot1 <- FeaturePlot( integrated.strain,  c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Cst3", "Stmn1"))
-plot2 <- VlnPlot(integrated.strain, features = genes, pt.size = 0)
+plot2 <- VlnPlot(integrated.strain, features =  c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Cst3", "Stmn1"), pt.size = 0)
 
 #################################
 
