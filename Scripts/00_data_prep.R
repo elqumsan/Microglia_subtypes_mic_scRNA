@@ -207,7 +207,9 @@ meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
         group.by = "seurat_clusters" )
 
-ggsave(paste(global_var$global$path_microglia_clustering, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
+ggsave(paste(global_var$global$path_data_prep, "Violin_after.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
+
+ggsave(paste(global_var$global$path_microglia_clustering, "Violin_after.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
 
 
