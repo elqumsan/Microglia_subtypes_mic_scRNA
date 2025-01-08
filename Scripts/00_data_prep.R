@@ -38,12 +38,15 @@ global_var <- read_yaml(file = "../Microglia_subtypes_mic_scRNA/00_project_param
 #source("../Microglia_subtypes_mic_scRNA-/Functions/norm_scale_dim_cluster_qc.R")
 #source("../Microglia_subtypes_mic_scRNA-/scripts/02_QC_starin_split.R")
 
+Vehdata.path <- "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/Veh/"
 
+#Vehdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
+#Veh_Project <- "WT_data_Microglia"
 
-Vehdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
-Veh_Project <- "WT_data_Microglia"
-AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
-AZT_Project <-  "AZT_data_Microglia"
+AZTdata.path <-   "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/AZT/"
+
+# AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
+# AZT_Project <-  "AZT_data_Microglia"
 
 Vehdata  <- Read10X(data.dir = Vehdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
 AZTdata <- Read10X(data.dir = AZTdata.path, gene.column = 2, cell.column = 1, unique.features = T, strip.suffix = F)
@@ -77,7 +80,10 @@ meta_tidy <- meta %>%
 ######### ribosomal gene
 ribo.genes <- grep( pattern = "^Rp[s1][[:digit:]]", x = rownames(integrated_object@assays$RNA),value = TRUE)
 integrated_object$percent.ribo <- PercentageFeatureSet(integrated_object, features = ribo.genes)
-microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "Trem2","P2ry12" ,"Cd81" ,"Cst3","Cst7", "Mertk", "Pros1","Siglech", "Sall1", "Hexb", "Fcrls" ) 
+
+microglia.gene.list <-  c( "Fcrls","P2ry12","Cx3cr1", "Trem2", "C1qa" ,"Tmem119") 
+
+#microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "Trem2","P2ry12" ,"Cd81" ,"Cst3","Cst7", "Mertk", "Pros1","Siglech", "Sall1", "Hexb", "Fcrls" ) 
 integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list )
 integrated_object[["percent.mt"]] <- PercentageFeatureSet(integrated_object, pattern = "^MT-")
 
@@ -113,8 +119,11 @@ ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units =
 
 #########  This step to get just Microglia cells from whole integrated data sets 
 ######### Cells filtering to just having Microglia cells in whole datasets
+Idents(object =  integrated_object) <- integrated_object$seurat_clusters
+Idents(integrated_object)
+table(Idents(integrated_object))
 
-integrated_object <- subset(x = integrated_object,idents=c(5 , 8, 9 , 10, 11 , 12, 13, 14, 15))
+integrated_object <- subset(x = integrated_object,idents=c(5, 6, 10, 11, 12, 13, 18))
 #integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
@@ -140,7 +149,7 @@ mg.strain <-what_dims(object_type = integrated_object, path = global_var$global$
 cells <- WhichCells(integrated_object)
 
 CellsMeta = integrated_object@meta.data
-randomnumbers <- runif(4269, 0.0, 1.1)
+randomnumbers <- runif(4338, 0.0, 1.1)
 CellsMeta["Gene_IDs"] <- randomnumbers
 head(CellsMeta)
 cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))
@@ -196,7 +205,7 @@ meta <- integrated.strain@meta.data %>% select(-starts_with("percent.r"))
 
 
 VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
-        group.by = "seurat_clusters")
+        group.by = "seurat_clusters" )
 
 ggsave(paste(global_var$global$path_microglia_clustering, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
