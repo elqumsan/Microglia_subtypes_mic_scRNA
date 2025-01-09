@@ -48,7 +48,7 @@ ggsave(paste(global_var$global$path_microglai_statistics, "fraction_replicates_s
 ############ generate meta data, for statistical testing and box plot 
 integrated.meta.stat <- mg.strain@meta.data %>%
                 mutate( strain=factor(strain, levels = c("Veh", "AZT")),
-                        new_clusters = ifelse(seurat_clusters %in% 8:19 , "H", as.character(seurat_clusters)),
+                        new_clusters = ifelse(seurat_clusters %in% 8:21 , "H", as.character(seurat_clusters)),
                         new_clusters=factor(new_clusters, levels = c("0","1","2","3","4","5","6", "7", "H"))) %>%
                 group_by(strain, new_clusters) %>%
                 summarise(Med_nFeature=median(nFeature_RNA),
@@ -158,7 +158,7 @@ filter(aov_table, Significance == "S")
 aov_stat = aov(Med_percent_mt ~ new_clusters, data = integrated.meta.stat)
 aov_table <- TukeyHSD(aov_stat) %>% .$new_clusters %>% data.frame() %>% rownames_to_column(var = "comparison") %>%
   mutate(comparison = paste(" ", comparison, sep = " "), Significance=ifelse(p.adj < 0.05 , "S", "NS"))
-write_delim(aov_table, path = paste(global_var$global$path_microglai_statistics, "Med__percent_mitochondria.txt", sep = "/"), delim = "\t")
+write_delim(aov_table, path = paste(global_var$global$path_microglai_statistics, "Med_percent_mitochondria.txt", sep = "/"), delim = "\t")
 filter(aov_table, Significance =="S")
 
 #write_delim(aov_table, path = paste(global_var$global$path_microglai_statistics, "Med_percent_mt_comp_cluster.txt", sep = "/"), delim = "\t")
@@ -179,7 +179,7 @@ integrated.strain$final_clusters <-ifelse(integrated.strain$seurat_clusters %in%
 sampling <- integrated.strain@meta.data %>% 
               rownames_to_column(var = "cell_ID") %>%
               group_by(strain) %>%
-              sample_n(1000)  # take 1000 random cells from each group
+              sample_n(550)  # take 1000 random cells from each group
 
 mg.small <- subset(integrated.strain, cells=sampling$cell_ID)
 
