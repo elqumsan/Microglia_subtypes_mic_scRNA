@@ -50,8 +50,7 @@ ggsave(paste(global_var$global$path_microglia_clustering, "/", "Dimplot_integart
 ######### Dot Plot of microglia marker genes for each clusters 
 
 #Idents(integrated.strain) <- "final_clusters"
- genes <- c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24" 
-          , "C3ar1", "Stmn1", "Top2a", "Birc5" ) 
+ genes <- c("Fcrls","P2ry12","Cx3cr1", "Trem2", "C1qa" ,"Tmem119" ) 
  
 # genes <- c("Cx3cr1", "Tmem119", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24", "Apoe" , "Nos2", "Tspo",  "Cd86" , "Cd16", "Cd32", 
 #            "Cd40", "IL6" , "IL12", "IL18", "Mmp9", "Mmp2", "Tnfrsf1a", "Ccl5", "Ccl10", "Cxcl1", "Cxcl9","Cxcl10",
@@ -68,7 +67,7 @@ ggsave(paste(global_var$global$path_microglia_clustering, "/", "Dimplot_integart
  
  ####### Feature plots of marker genes of microglia subclusters 
  
- genes <- c("Tmem119", "Ctss", "Cx3cr1", "P2ry12","Stmn1")
+ genes <- c("Fcrls","P2ry12","Cx3cr1", "Trem2", "C1qa" ,"Tmem119")
 
  ### Plot one gene
 p  <- genes %>% 
@@ -142,3 +141,4 @@ VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "
 
 ggsave(paste(global_var$global$path_microglia_clustering, "/percent_of_microG_in_each_cluster.png", sep = ""), units = "in", width = 4.5, height = 3.5 ,
        dpi = 300)
+
