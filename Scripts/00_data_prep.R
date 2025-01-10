@@ -120,7 +120,7 @@ ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units =
 #########  This step to get just Microglia cells from whole integrated data sets 
 ######### Cells filtering to just having Microglia cells in whole datasets
 Idents(object =  integrated_object) <- integrated_object$seurat_clusters
-Idents(integrated_object)
+# Idents(integrated_object)
 table(Idents(integrated_object))
 
 integrated_object <- subset(x = integrated_object,idents=c(5, 6, 10, 11, 12, 13, 18))
