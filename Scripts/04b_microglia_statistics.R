@@ -20,7 +20,7 @@ prop.table(table(Idents(mg.strain),mg.strain$strain), margin = 2)
 # generate meta data, 
 integrated.meta <- mg.strain@meta.data %>%
   mutate(strain = factor(strain, levels = c("Veh","AZT")),
-         new_clusters= ifelse(seurat_clusters %in% 8:19, "H" ,as.character(seurat_clusters)),
+         new_clusters= ifelse(seurat_clusters %in% 8:21, "H" ,as.character(seurat_clusters)),
         # new_clusters= ifelse(seurat_clusters %in% 0:0, "H" ,as.character(seurat_clusters)),
          new_clusters=factor(new_clusters, levels = c("0","1", "2","3","4", "5", "6", "7", "8", "H"))) %>%
   group_by(strain , new_clusters) %>%
