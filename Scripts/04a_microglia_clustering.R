@@ -81,7 +81,7 @@ p  <- genes %>%
          
        )
  
-(p[[1]]+p[[2]])/(p[[4]] +p[[5]])/(p[[3]])
+(p[[1]]+p[[2]])/(p[[3]] +p[[4]])/(p[[5]] + p[[6]])
 
 ggsave(paste(global_var$global$path_microglia_clustering, "/Feature_plot_all_2.png", sep = ""), units = "in", width = 10, height = 7 , dpi = 300)
 
