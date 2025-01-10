@@ -212,6 +212,8 @@ ggsave(paste(global_var$global$path_data_prep, "Violin_after.png", sep = "/"), u
 ggsave(paste(global_var$global$path_microglia_clustering, "Violin_after.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
 
-
+### Five Visualizations of marker feature expression 
+RidgePlot(integrated_object, features = microglia.gene.list, ncol = 2)
+ggsave(paste(global_var$global$path_data_prep, "RidgePlot.png", sep = "/"), units = "in", width = 10, height = 5, dpi = 200)
 
 meta_integrated_markers <-merge(meta, y= integrated_markers, add.cell.idec= c("meta", "marker"), Project = "meta_markers"  )
