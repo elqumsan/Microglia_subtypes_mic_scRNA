@@ -61,7 +61,11 @@ plot2 <- LabelPoints(plot = plot1 , points = top_feature, repel = TRUE)
 x <- plot1 + plot2
 ggsave(filename = paste(global_var$global$path_DE_seq_edgeR, "heterogeneity_analysis.png", sep = "/"), units = "in" , width = 10, height = 5, dpi = 300 )
 
+png(filename = paste(global_var$global$path_DE_seq_edgeR, "PCHeatmap.png", sep = "/") )
+PCHeatmap(integrated.strain, dims = 1:20, cells = 500 , balanced = TRUE, ncol = 3)
+dev.off()
 
+##ggsave(filename = paste(global_var$global$path_DE_seq_edgeR, "PCHeatmap.png", sep = "/"), units = "in", dpi = 300)
 
 ########## Non-linear dimension reduction for visualization 
 object1 <- RunTSNE(integrated.strain, dims = 1:20)
