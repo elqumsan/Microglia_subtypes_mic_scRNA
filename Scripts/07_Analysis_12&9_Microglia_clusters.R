@@ -52,3 +52,16 @@ p <- integrated.meta.stat %>%
         axis.title = element_blank(),
         legend.position = "bottom"
   )
+
+##### getting top enriched gene for Cluster 5 and 4
+markers_5 <- FindMarkers( integrated.strain, ident.1 = 5, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", logfc.threshold = 0.25, ident.use= "seurat_clusters")
+markers_5 <- markers_5[markers_5$p_val_adj<0.05,]
+markers_5 <- markers_5[order(markers_5$avg_log2FC, decreasing = T),]
+head(markers_5)
+top_gene_names_Cl_5 <- rownames(markers_5)
+head(top_gene_names_Cl_5)
+
+DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 5, label = FALSE)
+
+
+
