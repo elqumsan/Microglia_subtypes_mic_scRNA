@@ -59,9 +59,13 @@ markers_5 <- markers_5[markers_5$p_val_adj<0.05,]
 markers_5 <- markers_5[order(markers_5$avg_log2FC, decreasing = T),]
 head(markers_5)
 top_gene_names_Cl_5 <- rownames(markers_5)
-head(top_gene_names_Cl_5)
+top_10_genes_Cl_5 <- head(top_gene_names_Cl_5)
 
 DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 5, label = FALSE)
 
+##VariableFeatures(integrated.strain)[1:100]
+DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:500, 
+          size = 6 , angle = 90) + NoLegend()
 
-
+plot_1 <- FeaturePlot(integrated.strain, features =VariableFeatures(integrated.strain))
+HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
