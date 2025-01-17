@@ -60,12 +60,45 @@ markers_5 <- markers_5[order(markers_5$avg_log2FC, decreasing = T),]
 head(markers_5)
 top_gene_names_Cl_5 <- rownames(markers_5)
 top_10_genes_Cl_5 <- head(top_gene_names_Cl_5)
+FeaturePlot(integrated.strain, features = c(top_10_genes_Cl_5))
 
 DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 5, label = FALSE)
 
 ##VariableFeatures(integrated.strain)[1:100]
-DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:500, 
+DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:20, 
           size = 6 , angle = 90) + NoLegend()
 
 plot_1 <- FeaturePlot(integrated.strain, features =VariableFeatures(integrated.strain))
 HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
+
+########## Markers of  Cluster 4
+markers_4 <- FindMarkers( integrated.strain, ident.1 = 4, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", 
+                          logfc.threshold = 0.25, ident.use= "seurat_clusters")
+markers_4 <- markers_4[markers_4$p_val_adj<0.05,]
+markers_4 <- markers_4[order(markers_4$avg_log2FC, decreasing = T),]
+head(markers_4)
+top_gene_names_Cl_4 <-rownames(markers_4)
+Top_cl_4 <- head(top_gene_names_Cl_4)
+
+FeaturePlot(integrated.strain, features = c(Top_cl_4), ncol = 3 )
+
+
+DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 4, label = FALSE)
+
+DoHeatmap(integrated.strain, features =top_gene_names_Cl_4 , cells = 1:20, 
+          size = 6 , angle = 90) + NoLegend()
+
+
+plot_1 <- FeaturePlot(integrated.strain, features ="Rps5")
+HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
+
+
+
+######## Neuron/Neuroblast Tubb3, Meg3, Dcx
+FeaturePlot(integrated.strain, features = c("Tubb3", "MEg3", "Dcx"), ncol = 3)
+
+####### Astrocyte/Oligo/Endothelial: Gfap, Olig1, Vtn
+FeaturePlot(integrated.strain, features = c("Gfap", "Olig1", "Vtn"), ncol = 3)
+
+###### Macrophage/Monocyte:- F13a1, H2-Aa, Mgl2, Lyve1, and Ccr2
+FeaturePlot(integrated.strain, features = c("F13a1", "H2-Aa", "Mgl2", "Lyve1", "Cc1"), ncol = 3)
