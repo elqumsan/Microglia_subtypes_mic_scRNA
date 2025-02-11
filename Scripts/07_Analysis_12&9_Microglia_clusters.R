@@ -102,3 +102,33 @@ FeaturePlot(integrated.strain, features = c("Gfap", "Olig1", "Vtn"), ncol = 3)
 
 ###### Macrophage/Monocyte:- F13a1, H2-Aa, Mgl2, Lyve1, and Ccr2
 FeaturePlot(integrated.strain, features = c("F13a1", "H2-Aa", "Mgl2", "Lyve1", "Cc1"), ncol = 3)
+
+
+
+##### Percentage of each cluster in Seurat ("making a stacked bar graph of comparison of each condition") 
+
+pt <- table(Idents(integrated.strain), integrated.strain$orig.ident)
+pt <- as.data.frame(pt)
+pt$Var1 <- as.character(pt$Var1)
+
+ggplot(pt, aes(x = Var2, y = Freq, fill = Var1)) +
+  theme_bw(base_size = 15) +
+  geom_col(position = "fill", width = 0.5) +
+  xlab("Sample") +
+  ylab("Proportion") 
+#  scale_fill_manual(values = brewer.pal( 21, "Paired")) 
++ theme(legend.title = element_blank())
+
+cluster_proportions <- table(integrated.strain@active.ident) / ncol(integrated.strain)
+print(cluster_proportions)
+barplot(cluster_proportions,
+        xlab = "Cluster",
+        ylab = "proportion of cells",
+        main = "cell proportion per Cluster"
+        )
+
+cluster_assignments <- Idents(integrated.strain)
+cluster_proportions <-table(cluster_assignments)/ length(cluster_assignments)
+
+barplot(cluster_proportions)
+ggplot(cluster_proportions)
