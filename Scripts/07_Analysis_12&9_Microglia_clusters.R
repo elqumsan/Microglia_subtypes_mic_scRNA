@@ -1,4 +1,5 @@
 
+library(ggplot2)
 ########## Quick analysis for just Microglia cells, that's are in Cluster 12 and 9
 
 integrated_object <- subset(x = integrated_object,idents=c( 9 , 12))
@@ -129,6 +130,13 @@ barplot(cluster_proportions,
 
 cluster_assignments <- Idents(integrated.strain)
 cluster_proportions <-table(cluster_assignments)/ length(cluster_assignments)
+cluster_proportions <- list(cluster_proportions)
 
 barplot(cluster_proportions)
-ggplot(cluster_proportions)
+data.frame(integrated.strain$nCount_RNA, cluster_proportions )
+ggplot(integrated.strain$n ,aes(x= integrated.strain$strain, y= cluster_proportions))
+
+
+ggplot(pt, aes(fill= pt$Var2, y= pt$Freq, x= pt$Var1  )) +
+  geom_bar(position = "dodge", stat = "identity")
+
