@@ -55,13 +55,58 @@ p <- integrated.meta.stat %>%
   )
 
 ##### getting top enriched gene for Cluster 5 and 4
+
+########## Top Markers genes for  Cluster 0
+markers_0 <- FindMarkers( integrated.strain, ident.1 = 0, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", 
+                          logfc.threshold = 0.25, ident.use= "seurat_clusters")
+markers_0 <- markers_0[markers_0$p_val_adj<0.05,]
+markers_0 <- markers_0[order(markers_0$avg_log2FC, decreasing = T),]
+(markers_0)[0:10,]
+top_gene_names_Cl_0 <-rownames(markers_0[0:10,])
+Top_cl_0 <- (top_gene_names_Cl_0)
+
+FeaturePlot(integrated.strain, features = c(Top_cl_0), ncol = 2 )
+
+
+DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 4, label = FALSE)
+
+DoHeatmap(integrated.strain, features =top_gene_names_Cl_0 , cells = 0:10, 
+          size = 6 , angle = 90) + NoLegend()
+
+
+plot_1 <- FeaturePlot(integrated.strain, features ="Rps5")
+HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
+
+
+########## Top Markers genes of  Cluster 4
+markers_4 <- FindMarkers( integrated.strain, ident.1 = 4, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", 
+                          logfc.threshold = 0.25, ident.use= "seurat_clusters")
+markers_4 <- markers_4[markers_4$p_val_adj<0.05,]
+markers_4 <- markers_4[order(markers_4$avg_log2FC, decreasing = T),]
+head(markers_4)
+top_gene_names_Cl_4 <-rownames(markers_4)
+Top_cl_4 <- (top_gene_names_Cl_4)[0:10]
+
+FeaturePlot(integrated.strain, features = c(Top_cl_4), ncol = 2 )
+
+
+DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 4, label = FALSE)
+
+DoHeatmap(integrated.strain, features =top_gene_names_Cl_4 , cells = 1:20, 
+          size = 6 , angle = 90) + NoLegend()
+
+
+plot_1 <- FeaturePlot(integrated.strain, features ="Rps5")
+HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
+
+####### Top markers genes for cluster 5
 markers_5 <- FindMarkers( integrated.strain, ident.1 = 5, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", logfc.threshold = 0.25, ident.use= "seurat_clusters")
 markers_5 <- markers_5[markers_5$p_val_adj<0.05,]
 markers_5 <- markers_5[order(markers_5$avg_log2FC, decreasing = T),]
 head(markers_5)
 top_gene_names_Cl_5 <- rownames(markers_5)
-top_10_genes_Cl_5 <- head(top_gene_names_Cl_5)
-FeaturePlot(integrated.strain, features = c(top_10_genes_Cl_5))
+top_10_genes_Cl_5 <- (top_gene_names_Cl_5)[0:20]
+FeaturePlot(integrated.strain, features = c(top_10_genes_Cl_5), ncol = 2)
 
 DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 5, label = FALSE)
 
@@ -72,25 +117,22 @@ DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:20,
 plot_1 <- FeaturePlot(integrated.strain, features =VariableFeatures(integrated.strain))
 HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
 
-########## Markers of  Cluster 4
-markers_4 <- FindMarkers( integrated.strain, ident.1 = 4, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", 
-                          logfc.threshold = 0.25, ident.use= "seurat_clusters")
-markers_4 <- markers_4[markers_4$p_val_adj<0.05,]
-markers_4 <- markers_4[order(markers_4$avg_log2FC, decreasing = T),]
-head(markers_4)
-top_gene_names_Cl_4 <-rownames(markers_4)
-Top_cl_4 <- head(top_gene_names_Cl_4)
+####### Top markers genes for cluster 15
+markers_15 <- FindMarkers( integrated.strain, ident.1 = 15, only.pos = TRUE, min.pct= 0.25, test.use = "wilcox", logfc.threshold = 0.25, ident.use= "seurat_clusters")
+markers_15 <- markers_15[markers_15$p_val_adj<0.05,]
+markers_15 <- markers_15[order(markers_15$avg_log2FC, decreasing = T),]
+head(markers_15)
+top_gene_names_Cl_15 <- rownames(markers_15)
+top_10_genes_Cl_15 <- (top_gene_names_Cl_15)[0:10]
+FeaturePlot(integrated.strain, features = c(top_10_genes_Cl_15), ncol = 2)
 
-FeaturePlot(integrated.strain, features = c(Top_cl_4), ncol = 3 )
+DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 5, label = FALSE)
 
-
-DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 4, label = FALSE)
-
-DoHeatmap(integrated.strain, features =top_gene_names_Cl_4 , cells = 1:20, 
+##VariableFeatures(integrated.strain)[1:100]
+DoHeatmap(integrated.strain, features = top_10_genes_Cl_15, cells = 1:20, 
           size = 6 , angle = 90) + NoLegend()
 
-
-plot_1 <- FeaturePlot(integrated.strain, features ="Rps5")
+plot_1 <- FeaturePlot(integrated.strain, features =VariableFeatures(integrated.strain))
 HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c("ident", "PC_1", "nFeature_RNA")))
 
 
@@ -139,4 +181,27 @@ ggplot(integrated.strain$n ,aes(x= integrated.strain$strain, y= cluster_proporti
 
 ggplot(pt, aes(fill= pt$Var2, y= pt$Freq, x= pt$Var1  )) +
   geom_bar(position = "dodge", stat = "identity")
+ 
+######### Analysis of transcriptomic signature for each cluster, especially for AZT-related clusters (Gene expression analysis)cluster_markers 
+cluster_markers <- FindAllMarkers(integrated.strain, only.pos = TRUE, min.pct = 0.25 , logfc.threshold = 0.25 )
+i=0
 
+for (i in levels(cluster_markers$cluster)) {
+  cluster_markers[cluster_markers$cluster == i,] <- cluster_markers[cluster_markers$cluster == i,]
+ cluster_markers[cluster_markers$p_val_adj,] <-cluster_markers[cluster_markers$p_val_adj< 0.05,]
+ cluster_markers[cluster_markers$avg_log2FC,] <- cluster_markers[order(cluster_markers$avg_log2FC, decreasing = T),]
+  
+ #top_gene_names_Cl <- rownames(cluster_markers)[cluster_markers$cluster == i]
+ #top_10_genes_Cl <- head(top_gene_names_Cl)
+ #FeaturePlot(integrated.strain, features = c(top_10_genes_Cl))
+ 
+ 
+# DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 5, label = FALSE)
+ 
+ ##VariableFeatures(integrated.strain)[1:100]
+
+ 
+}
+
+DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:20, 
+           size = 6 , angle = 90) + NoLegend()
