@@ -205,3 +205,23 @@ for (i in levels(cluster_markers$cluster)) {
 
 DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:20, 
            size = 6 , angle = 90) + NoLegend()
+
+
+####################### Perform differential expression analysis for each cluster
+
+all_markers <- FindAllMarkers(integrated.strain, only.pos = TRUE, min.pct = 0.25 ,logfc.threshold = 0.25)
+                         
+## Filter for upregulated genes (Positive logFC)
+upregulated_genes <- all_markers %>% filter(avg_log2FC > 0)
+
+## Filter for dowregulated genes (negative LogFC)
+downregulated_genes  <- all_markers %>% filter(avg_log2FC < 0)
+
+#### Counnt Up/downregulated genes per cluster
+cluster_counts <- upregulated_genes %>% group_by(cluster) %>%
+  summarise(upregulated_count = n()) %>%
+  left_join(downregulated_genes %>% group_by(cluster) %>% summarise(downregulated_count = n()), by = "cluster")
+
+ print(cluster_counts)
+                         
+                         
