@@ -222,6 +222,6 @@ cluster_counts <- upregulated_genes %>% group_by(cluster) %>%
   summarise(upregulated_count = n()) %>%
   left_join(downregulated_genes %>% group_by(cluster) %>% summarise(downregulated_count = n()), by = "cluster")
 
- print(cluster_counts)
+ print(cluster_counts, n = 40)
                          
                          
