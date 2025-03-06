@@ -1,5 +1,6 @@
 
 library(ggplot2)
+library(gridExtra)
 ########## Quick analysis for just Microglia cells, that's are in Cluster 12 and 9
 
 integrated_object <- subset(x = integrated_object,idents=c( 9 , 12))
@@ -212,10 +213,12 @@ DoHeatmap(integrated.strain, features =top_gene_names_Cl_5 , cells = 1:20,
 all_markers <- FindAllMarkers(integrated.strain, only.pos = TRUE, min.pct = 0.25 ,logfc.threshold = 0.25)
                          
 ## Filter for upregulated genes (Positive logFC)
-upregulated_genes <- all_markers %>% filter(avg_log2FC > 0)
+upregulated_genes <- all_markers %>% filter(avg_log2FC > 0 )
+
+upregulated_genes <- all_markers %>% filter(avg_log2FC > 0,  cluster == c(0, 4, 5, 15) )
 
 ## Filter for dowregulated genes (negative LogFC)
-downregulated_genes  <- all_markers %>% filter(avg_log2FC < 0)
+downregulated_genes  <- all_markers %>% filter(avg_log2FC < 0, cluster == c(0, 4 , 5, 15))
 
 #### Counnt Up/downregulated genes per cluster
 cluster_counts <- upregulated_genes %>% group_by(cluster) %>%
@@ -224,4 +227,23 @@ cluster_counts <- upregulated_genes %>% group_by(cluster) %>%
 
  print(cluster_counts, n = 40)
                          
-                         
+
+ ########### Graphically represent for Up/Downregulated genes per clusters   
+ ## Plot the data with table Grob
+ ss <- tableGrob(cluster_counts)
+ 
+ # Make a scatterplot of your data
+ k <- ggplot(cluster_counts) +
+   geom_point(  aes(x= cluster_counts$cluster, y=cluster_counts$upregulated_count ))
+
+ ##### Arrange them as you want with grid.arrange 
+ grid.arrange(k, ss)
+
+ 
+ ####### Identification of highly variable genes  
+ pbmc <-FindVariableFeatures( integrated.strain, selection.method = "vst", nfeatures = 2000)
+ top10_gene <- head(VariableFeatures(pbmc),10 )
+plot1 <- VariableFeaturePlot(pbmc) 
+plot2 <- LabelPoints(plot = plot1, points = top10_gene, repel = TRUE)
+ plot1 +plot2
+ 
