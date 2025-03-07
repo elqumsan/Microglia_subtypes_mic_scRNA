@@ -52,8 +52,8 @@ newObject$cluster <- newObject[[paste0("RNA_snn_res.", optRes)]]
 
 reorderCluster = c( "4", "9", "12", "13", "20", "14", "16",   # Prog
                     "17", "10", "18", "23",                   # Ery
-                    "11", "24", "25", "7", "21", "28",         # Myeloid
-                    "22","15","8","27", "26",              # B-Lymophoid
+                    "11", "24", "25", "7", "21",             # Myeloid
+                    "22","15","8", "26",                     # B-Lymophoid
                     "5", "1", "0", "19", "6", "3", "2"     # T-Lymphoid
                     
                     )
@@ -64,23 +64,44 @@ Idents(newObject) <- newObject$cluster # Set Seurat to use optRes
 ## Plot ideal resolution on tSNE and UMAP
 nClust <- uniqueN(Idents(newObject))       # Setup color palette 
 colCls <- colorRampPalette(brewer.pal(n = 10, name = "Paired")) (nClust)
-DimPlot(newObject, reduction = "umap", pt.size = 0.1 , label = TRUE, label.size = 3, cols = colCls ) + plotTheme + coord_fixed()
+p1 <- DimPlot(newObject, reduction = "umap", pt.size = 0.1 , label = TRUE, label.size = 3, cols = colCls ) + plotTheme + coord_fixed()
 
+ggsave(p1, 
+       width = 10, height = 4, filename  = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clusDimPlot.png")
 
-## Proportion / cell number composition per cluster
-ggData <- as.matrix(prop.table(table(newObject$cluster, newObject$nCount_RNA), margin = 2))
+## Proportion / cell number composition per sub_type
+ggData <- as.matrix(prop.table(table(newObject$cluster, newObject$orig.ident), margin = 2))
 
-pheatmap(ggData, color = colorRampPalette(colGEX)(10),
+pheatmap(ggData, color = colorRampPalette(colGEX)(100),
          cluster_rows = FALSE, cutree_cols = 2,
          display_numbers = TRUE, number_format = "%.3f", angle_col = 315,
          width = 4, height = 6, filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clustComLibH.png" )
 
-ggData <- data.frame(prop.table(table(newObject@meta.data$nCount_RNA, newObject$cluster),margin = 2))
 
 
+ggData <- data.frame(prop.table(table(newObject$cluster, newObject$orig.ident), margin = 2))
 
-colnames(ggData)<-c("library", "cluster", "value")
+colnames(ggData)<-c("cluster.No", "sub_type", "proportion")
 
-p1 <-  ggplot(ggData, aes(cluster, value, fill = library )) +
-  geom_col() + xlab("cluster") + ylab("Proportion of cells (%)") +
-  scale_fill_manual(values = colLib) + plotTheme + coord_flip() 
+p1 <-  ggplot(ggData, aes(sub_type, proportion, fill = cluster.No )) +
+  geom_col() + xlab("sub_type") + ylab("Proportion of cells (%)") +
+  scale_fill_manual(values = colCls) + plotTheme + coord_flip() 
+
+ggsave(p1, 
+       width = 10, height = 6 , filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clustComLib.png" )
+
+
+####### Proportion / cell number composition per cluster
+ggData= data.frame(prop.table(table(newObject$orig.ident, newObject$cluster), margin = 2))
+colnames(ggData) <- c("sub_type", "cluster.No", "proportion")
+p1 <- ggplot(ggData, aes(cluster.No, proportion , fill= sub_type)) + 
+     geom_col() + xlab("cluster.No") + ylab("proportion of cells (%)") +
+  scale_fill_manual(values = colLib) + plotTheme + coord_flip()
+
+ggData = data.frame(table(newObject$orig.ident, newObject$cluster))
+colnames(ggData) = c("sub_type", "cluster.No", "proportion")
+p2 <- ggplot(ggData, aes(cluster.No, proportion, fill = sub_type)) +
+  geom_col() + xlab("cluster") + ylab(" Cell Number") +
+  scale_fill_manual(values = colLib) + plotTheme + coord_flip()
+
+
