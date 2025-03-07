@@ -104,4 +104,5 @@ p2 <- ggplot(ggData, aes(cluster.No, proportion, fill = sub_type)) +
   geom_col() + xlab("cluster") + ylab(" Cell Number") +
   scale_fill_manual(values = colLib) + plotTheme + coord_flip()
 
-
+ggsave(p1 + p2 + plot_layout(guides = "collect"),
+       width = 10, height = 6,  filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clustComClust.png")
