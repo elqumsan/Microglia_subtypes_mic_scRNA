@@ -47,7 +47,7 @@ ggsave(p1 + scale_color_manual(values = brewer.pal(12, "Paired")) +
        )
 
 optRes <- 1.0                           # determined from clustering tree
-newObject$seurat_clusters <- NULL       # Remove this column to prevenr confusion 
+newObject$seurat_clusters <- NULL       # Remove this column to prevent confusion 
 newObject$cluster <- newObject[[paste0("RNA_snn_res.", optRes)]]
 
 reorderCluster = c( "4", "9", "12", "13", "20", "14", "16",   # Prog
@@ -117,3 +117,16 @@ p2 <- ggplot(ggData, aes(cluster.No, proportion, fill = sub_type)) +
 ggsave(p1 + p2 + plot_layout(guides = "collect"),
        width = 10, height = 6,  
        filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clustComClust.png")
+
+
+#########################
+######################### Find Markers
+
+oupMarkers <- FindAllMarkers(newObject, only.pos = TRUE , logfc.threshold =1.0,  min.pct = 0.2)
+oupMarkers <- data.table(oupMarkers)
+oupMarkers$pct.diff = oupMarkers$pct.1 = oupMarkers$pct.2 
+oupMarkers <-oupMarkers[,c("cluster", "gene", "avg_log2FC", "pct.1", "pct.2", "pct.diff", "p_val", "p_val_adj")]
+fwrite(oupMarkers, sep = "\t", file = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clusterMarkers.txt")
+
+
+#### Check if known genes are  in the marker gene list
