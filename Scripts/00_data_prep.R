@@ -101,6 +101,7 @@ integrated_object<- integrated_object %>%
   ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
   RunPCA() %>%
   RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
+  RunTSNE(reduction = "pca", dims = 1:pca_dim) %>%
   FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%
   FindClusters(resolution = c(0.5 ,0.6, 0.7, 0.8 ))
 
@@ -149,7 +150,7 @@ mg.strain <-what_dims(object_type = integrated_object, path = global_var$global$
 cells <- WhichCells(integrated_object)
 
 CellsMeta = integrated_object@meta.data
-randomnumbers <- runif(4338, 0.0, 1.1)
+randomnumbers <- runif( 1170, 0.0, 1.1)
 CellsMeta["Gene_IDs"] <- randomnumbers
 head(CellsMeta)
 cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))

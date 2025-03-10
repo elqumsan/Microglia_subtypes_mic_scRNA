@@ -64,9 +64,11 @@ Idents(newObject) <- newObject$cluster # Set Seurat to use optRes
 ## Plot ideal resolution on tSNE and UMAP
 nClust <- uniqueN(Idents(newObject))       # Setup color palette 
 colCls <- colorRampPalette(brewer.pal(n = 10, name = "Paired")) (nClust)
-p1 <- DimPlot(newObject, reduction = "umap", pt.size = 0.1 , label = TRUE, label.size = 3, cols = colCls ) + plotTheme + coord_fixed()
+p1 <- DimPlot(newObject, reduction = "tsne", pt.size = 0.1,  label = TRUE, label.size = 3, cols = colCls) + plotTheme + coord_fixed()
 
-ggsave(p1, 
+p2 <- DimPlot(newObject, reduction = "umap", pt.size = 0.1 , label = TRUE, label.size = 3, cols = colCls ) + plotTheme + coord_fixed()
+
+ggsave(p1+ p2+ plot_layout(guides = "collect"), 
        width = 10, height = 4, filename  = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clusDimPlot.png")
 
 ## Proportion / cell number composition per sub_type
