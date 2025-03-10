@@ -87,8 +87,16 @@ p1 <-  ggplot(ggData, aes(sub_type, proportion, fill = cluster.No )) +
   geom_col() + xlab("sub_type") + ylab("Proportion of cells (%)") +
   scale_fill_manual(values = colCls) + plotTheme + coord_flip() 
 
-ggsave(p1, 
-       width = 10, height = 6 , filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clustComLib.png" )
+ggData <- data.frame(table(newObject$cluster, newObject$orig.ident))
+colnames(ggData)<- c("cluster.No", "sub_type", "proportion")
+
+p2 <- ggplot(ggData, aes(sub_type, proportion, fill = cluster.No))+
+       geom_col() + xlab("sub_type") + ylab("Cell Number") + 
+        scale_fill_manual(values = colCls) + plotTheme + coord_flip()
+
+
+ggsave(p1 + p2 + plot_layout(guides = "collect"), 
+       width = 14, height = 6 , filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/clustComLib.png" )
 
 
 ####### Proportion / cell number composition per cluster
