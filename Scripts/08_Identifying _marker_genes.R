@@ -122,11 +122,29 @@ ggsave(p1 + p2 + plot_layout(guides = "collect"),
 #########################
 ######################### Find Markers
 
-oupMarkers <- FindAllMarkers(newObject, only.pos = TRUE , logfc.threshold =1.0,  min.pct = 0.2)
-oupMarkers <- data.table(oupMarkers)
-oupMarkers$pct.diff = oupMarkers$pct.1 = oupMarkers$pct.2 
-oupMarkers <-oupMarkers[,c("cluster", "gene", "avg_log2FC", "pct.1", "pct.2", "pct.diff", "p_val", "p_val_adj")]
-fwrite(oupMarkers, sep = "\t", file = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clusterMarkers.txt")
+oupMarker <- FindAllMarkers(newObject, only.pos = TRUE , logfc.threshold =1.0,  min.pct = 0.2)
+oupMarker <- data.table(oupMarker)
+oupMarker$pct.diff = oupMarker$pct.1 = oupMarker$pct.2 
+oupMarker <-oupMarker[,c("cluster", "gene", "avg_log2FC", "pct.1", "pct.2", "pct.diff", "p_val", "p_val_adj")]
+fwrite(oupMarker, sep = "\t", file = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clusterMarkers.txt")
 
 
 #### Check if known genes are  in the marker gene list
+KnownGenes <- c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24" 
+                , "C3ar1", "Stmn1", "Top2a", "Birc5")
+oupMarker[gene %in% KnownGenes]
+
+## Get top genes for each cluster and do dotplot / violin plot
+oupMarker$cluster = factor(oupMarker$cluster, levels = reorderCluster)
+oupMarker = oupMarker[order(cluster, -avg_log2FC)]
+genes.to.plot <- unique(oupMarker[cluster %in% reorderCluster,
+                                  head(.SD, 2), by = "cluster"]$gene)
+
+p1 <- DotPlot(newObject, group.by = "cluster", features = genes.to.plot) + 
+  coord_flip() + scale_color_gradientn(colors = colGEX)  +
+                                         theme(axis.text.x = element_text(angle = - 45, hjust = 0) )
+ggsave(p1, width = 10, height = 8, filename = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clusterMarkersDot.png" )
+
+p2 <- VlnPlot(newObject, group.by = "cluster", fill.by = "ident", cols= colCls, features = genes.to.plot, stack = TRUE, flip = TRUE )
+
+ggsave(p2, width = 10, he)
