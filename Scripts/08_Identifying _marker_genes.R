@@ -120,11 +120,11 @@ ggsave(p1 + p2 + plot_layout(guides = "collect"),
 
 
 #########################
-######################### Find Markers
+######################### Find Markers genes
 
 oupMarker <- FindAllMarkers(newObject, only.pos = TRUE , logfc.threshold =1.0,  min.pct = 0.2)
 oupMarker <- data.table(oupMarker)
-oupMarker$pct.diff = oupMarker$pct.1 = oupMarker$pct.2 
+oupMarker$pct.diff = oupMarker$pct.1 - oupMarker$pct.2 
 oupMarker <-oupMarker[,c("cluster", "gene", "avg_log2FC", "pct.1", "pct.2", "pct.diff", "p_val", "p_val_adj")]
 fwrite(oupMarker, sep = "\t", file = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clusterMarkers.txt")
 
@@ -147,4 +147,4 @@ ggsave(p1, width = 10, height = 8, filename = "../Microglia_subtypes_mic_scRNA/f
 
 p2 <- VlnPlot(newObject, group.by = "cluster", fill.by = "ident", cols= colCls, features = genes.to.plot, stack = TRUE, flip = TRUE )
 
-ggsave(p2, width = 10, he)
+ggsave(p2, width = 10, height = 8 , filename = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clustMarkersVln.png")
