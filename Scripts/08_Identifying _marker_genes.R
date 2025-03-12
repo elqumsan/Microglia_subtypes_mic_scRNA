@@ -22,6 +22,10 @@ library(clusterProfiler)
 library(msigdbr)
 library(BiocParallel)
 
+library(clusterProfiler)
+library(gProfileR)
+
+
 #### Define color palettes and plot themes
 plotTheme <- theme_classic(base_size = 18)
 colLib = brewer.pal(7,  "Paired")
@@ -148,3 +152,41 @@ ggsave(p1, width = 10, height = 8, filename = "../Microglia_subtypes_mic_scRNA/f
 p2 <- VlnPlot(newObject, group.by = "cluster", fill.by = "ident", cols= colCls, features = genes.to.plot, stack = TRUE, flip = TRUE )
 
 ggsave(p2, width = 10, height = 8 , filename = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clustMarkersVln.png")
+
+####### Gene module analysis + module score
+####  Functional analysis using clusterProfiler and  msigdb
+
+oupMarkerFunc = data.table()
+set.seed(42)
+
+for (iDB in c("c8", "C5_GO:BP")) {
+# Get reference gene set from msigdbr  
+  inpGS <- tstrsplit(iDB, "_")
+  msigCat <- inpGS[[1]] ;  msigSubCat <- NULL
+  if (length(inpGS) >= 2) { msigSubCat <- inpGS[[2]]}
+  
+  inpGS <- data.frame(msigdbr( species = "Mus musculus", category = "C2", subcategory = "CGP" ))
+  
+  inpGS <- inpGS[, c("gs_name", "gene_symbol")]
+  
+  #### start up clusterProfiler
+  for (i in unique(oupMarker$cluster)) {
+  tmpOut <-  enricher(oupMarker[cluster == i]$gene, universe = rownames(newObject) , TERM2GENE = inpGS)
+    tmpOut <- data.table(sigdb = iDB, cluster = i , data.frame(tmpOut[, -2])) 
+    tmpOut$mLog10Padj <- -log10(tmpOut$p.adjust)
+    tmpOut <- tmpOut[order(-mLog10Padj)]
+    oupMarkerFunc <- rbindlist(list(oupMarkerFunc, tmpOut))
+      }
+  
+}
+oupMarkerFunc$cluster <- factor(oupMarkerFunc$cluster, levels = reorderCluster)
+newObject@misc$markerFunc <- oupMarkerFunc ## store func analysis into Seurat object 
+
+#### plot functional analysis results
+ggData <- oupMarkerFunc[grep("BONE_MARROW",ID)]
+
+ggplot(ggData, aes(cluster, ID, size = count, color = mLog10Padj)) +
+  geom_point() + theme_linedraw(base_size = 18) +
+  theme(axis.text.x = element_text(angle = -45, hjust = 0)) + 
+  scale_color_gradientn(colours = colGEX, limits = c(0, 10), na.value = colGEX[8])
+
