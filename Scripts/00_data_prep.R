@@ -136,6 +136,7 @@ integrated_object<- integrated_object %>%
   ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
   RunPCA() %>%
   RunUMAP(reduction = "pca", dims = 1:pca_dim ) %>%
+  RunTSNE(reduction = "pca", dims = 1:pca_dim) %>%
   FindNeighbors(reduction = "pca", dims = 1:pca_dim ) %>%
   FindClusters(resolution = c(0.5 ,0.6, 0.7, 0.8 ))
 

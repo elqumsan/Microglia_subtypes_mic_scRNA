@@ -1,3 +1,5 @@
+# install.packages("msigdbdf", repos = "https://igordot.r-universe.dev")
+
 library(clustree)
 library("RColorBrewer")
 library(ggplot2)
@@ -21,6 +23,11 @@ library(pheatmap)
 library(clusterProfiler)
 library(msigdbr)
 library(BiocParallel)
+library(msigdb)
+library(msigdbr)
+library(ExperimentHub)
+library(GSEABase)
+library(enrichR)
 
 library(clusterProfiler)
 library(gProfileR)
@@ -165,7 +172,7 @@ for (iDB in c("c8", "C5_GO:BP")) {
   msigCat <- inpGS[[1]] ;  msigSubCat <- NULL
   if (length(inpGS) >= 2) { msigSubCat <- inpGS[[2]]}
   
-  inpGS <- data.frame(msigdbr( species = "Mus musculus", category = "C2", subcategory = "CGP" ))
+  inpGS <- data.frame(msigdbr( species = "mouse", category = "C2", subcategory = "CGP" ))
   
   inpGS <- inpGS[, c("gs_name", "gene_symbol")]
   
@@ -185,7 +192,7 @@ newObject@misc$markerFunc <- oupMarkerFunc ## store func analysis into Seurat ob
 #### plot functional analysis results
 ggData <- oupMarkerFunc[grep("BONE_MARROW",ID)]
 
-ggplot(ggData, aes(cluster, ID, size = count, color = mLog10Padj)) +
+ggplot(ggData, aes(cluster, ID, size = Count, color = mLog10Padj)) +
   geom_point() + theme_linedraw(base_size = 18) +
   theme(axis.text.x = element_text(angle = -45, hjust = 0)) + 
   scale_color_gradientn(colours = colGEX, limits = c(0, 10), na.value = colGEX[8])
