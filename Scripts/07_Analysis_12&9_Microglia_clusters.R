@@ -3,7 +3,7 @@ library(ggplot2)
 library(gridExtra)
 ########## Quick analysis for just Microglia cells, that's are in Cluster 12 and 9
 
-integrated_object <- subset(x = integrated_object,idents=c( 9 , 12))
+integrated_object <- subset(x = integrated_object,idents=c( 7, 9 ))
 
 
 VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
@@ -139,13 +139,13 @@ HoverLocator(plot = plot_1, information = FetchData(integrated.strain, vars = c(
 
 
 ######## Neuron/Neuroblast Tubb3, Meg3, Dcx
-FeaturePlot(integrated.strain, features = c("Tubb3", "MEg3", "Dcx"), ncol = 3)
+FeaturePlot(integrated.strain, features = c("Tubb3", "Meg3", "Dcx"), ncol = 3)
 
 ####### Astrocyte/Oligo/Endothelial: Gfap, Olig1, Vtn
 FeaturePlot(integrated.strain, features = c("Gfap", "Olig1", "Vtn"), ncol = 3)
 
-###### Macrophage/Monocyte:- F13a1, H2-Aa, Mgl2, Lyve1, and Ccr2
-FeaturePlot(integrated.strain, features = c("F13a1", "H2-Aa", "Mgl2", "Lyve1", "Cc1"), ncol = 3)
+####### Macrophage/Monocyte:- F13a1, H2-Aa, Mgl2, Lyve1, and Ccr2
+FeaturePlot(integrated.strain, features = c("F13a1", "H2-Aa", "Mgl2", "Lyve1", "Ccr2"), ncol = 3)
 
 
 
@@ -159,9 +159,9 @@ ggplot(pt, aes(x = Var2, y = Freq, fill = Var1)) +
   theme_bw(base_size = 15) +
   geom_col(position = "fill", width = 0.5) +
   xlab("Sample") +
-  ylab("Proportion") 
+  ylab("Proportion") + 
 #  scale_fill_manual(values = brewer.pal( 21, "Paired")) 
-+ theme(legend.title = element_blank())
+ theme(legend.title = element_blank())
 
 cluster_proportions <- table(integrated.strain@active.ident) / ncol(integrated.strain)
 print(cluster_proportions)
