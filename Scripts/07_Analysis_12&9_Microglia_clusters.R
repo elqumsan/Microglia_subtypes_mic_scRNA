@@ -171,13 +171,8 @@ barplot(cluster_proportions,
         main = "cell proportion per Cluster"
         )
 
-cluster_assignments <- Idents(integrated.strain)
-cluster_proportions <-table(cluster_assignments)/ length(cluster_assignments)
-cluster_proportions <- list(cluster_proportions)
 
-barplot(cluster_proportions)
-data.frame(integrated.strain$nCount_RNA, cluster_proportions )
-ggplot(integrated.strain$n ,aes(x= integrated.strain$strain, y= cluster_proportions))
+
 
 
 ggplot(pt, aes(fill= pt$Var2, y= pt$Freq, x= pt$Var1  )) +

@@ -107,8 +107,12 @@ integrated_object<- integrated_object %>%
 
 
 #### integrated.strain object has no layers, all layers have been merged to be eligible for the rest analysis 
-integrated.strain <- integrated_object
-integrated.strain <- JoinLayers(integrated.strain)
+Raw.data <- integrated_object
+
+#integrated.strain <- integrated_object
+#integrated.strain <- JoinLayers(integrated.strain)
+
+
 
 
 ############ This step is just to pick Microglia cells that are located in clusters 12, 5, 8, 9, 10, 11 ,13,  14 , 15, 
@@ -118,19 +122,22 @@ VlnPlot(integrated_object, feature = microglia.gene.list, pt.size = 0, assay = "
 
 ggsave(paste(global_var$global$path_data_prep, "Violin.png", sep = "/"), units = "in" , width = 10, height = 5 , dpi = 200)
 
+VlnPlot(integrated_object, c("nCount_RNA", "percent.microglia"), ncol = 2)
+
+
 #########  This step to get just Microglia cells from whole integrated data sets 
 ######### Cells filtering to just having Microglia cells in whole datasets
 Idents(object =  integrated_object) <- integrated_object$seurat_clusters
 # Idents(integrated_object)
 table(Idents(integrated_object))
 
-integrated_object <- subset(x = integrated_object,idents=c(5, 6, 10, 11, 12, 13, 18))
+integrated.strain <- subset(x = integrated_object,idents=c(5, 6, 10, 11, 12, 13, 18))
 #integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
 ##################################
 pca_dim = 11
-integrated_object<- integrated_object %>% 
+integrated.strain<- integrated.strain %>% 
   NormalizeData() %>%
   FindVariableFeatures(selection.method = "vst", nfeatures = 3000) %>%
   ScaleData(vars.to.regress = c("nFeature_RNA", "strain","percent.microglia" ,"percent.ribo", "percent.mt")) %>%
@@ -142,26 +149,27 @@ integrated_object<- integrated_object %>%
 
 
 #### integrated.strain object has no layers, all layers have been merged to be eligible for the rest analysis 
-integrated.strain <- integrated_object
+#integrated.strain <- integrated_object
+
 integrated.strain <- JoinLayers(integrated.strain)
 
 #########
-mg.strain <-what_dims(object_type = integrated_object, path = global_var$global$Path_QC_Strain_findings, strain = global_var$global$strain , round = global_var$global$round  )
+mg.strain <-what_dims(object_type = integrated.strain, path = global_var$global$Path_QC_Strain_findings, strain = global_var$global$strain , round = global_var$global$round  )
 
-cells <- WhichCells(integrated_object)
+cells <- WhichCells(integrated.strain)
 
-CellsMeta = integrated_object@meta.data
+CellsMeta = integrated.strain@meta.data
 randomnumbers <- runif(4338, 0.0, 1.1)
 CellsMeta["Gene_IDs"] <- randomnumbers
 head(CellsMeta)
 cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))
-integrated_object <-AddMetaData(integrated_object, cellsMetaTrim)
-head(integrated_object)
+integrated.strain <-AddMetaData(integrated.strain, cellsMetaTrim)
+head(integrated.strain)
 
-VlnPlot(integrated_object, c("nCount_RNA", "percent.microglia"), ncol = 2)
+VlnPlot(integrated.strain, c("nCount_RNA", "percent.microglia"), ncol = 2)
 ggsave(paste(global_var$global$path_data_prep, "volcano.png",  sep = "/"), units = "in", width = 10, height = 5, dpi= 200)
 
-DimPlot(integrated_object, group.by = c("orig.ident", "seurat_clusters"))
+DimPlot(integrated.strain, group.by = c("orig.ident", "seurat_clusters"))
 ggsave(paste(global_var$global$path_data_prep, "cluster_for_AZT_&_Veh.png", sep = "/"), units = "in", width = 10, height = 5, dpi = 200)
 
 
