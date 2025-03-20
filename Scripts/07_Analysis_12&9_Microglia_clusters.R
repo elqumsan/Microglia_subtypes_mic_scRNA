@@ -167,7 +167,7 @@ cluster_proportions <- table(integrated.strain@active.ident) / ncol(integrated.s
 print(cluster_proportions)
 barplot(cluster_proportions,
         xlab = "Cluster",
-        ylab = "proportion of cells",
+        ylab = "Proportion of cells",
         main = "cell proportion per Cluster"
         )
 
