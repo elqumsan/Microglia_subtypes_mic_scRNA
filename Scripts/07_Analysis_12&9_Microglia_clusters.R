@@ -93,7 +93,7 @@ FeaturePlot(integrated.strain, features = c(Top_cl_4), ncol = 2 )
 
 DimPlot(integrated.strain, reduction = "pca", group.by = "seurat_clusters", order = 4, label = FALSE)
 
-DoHeatmap(integrated.strain, features =top_gene_names_Cl_4 , cells = 1:20, 
+DoHeatmap(integrated.strain, features =Top_cl_4 , cells = 1:20, 
           size = 6 , angle = 90) + NoLegend()
 
 
