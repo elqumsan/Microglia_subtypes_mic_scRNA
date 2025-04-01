@@ -81,7 +81,8 @@ meta_tidy <- meta %>%
 ribo.genes <- grep( pattern = "^Rp[s1][[:digit:]]", x = rownames(integrated_object@assays$RNA),value = TRUE)
 integrated_object$percent.ribo <- PercentageFeatureSet(integrated_object, features = ribo.genes)
 
-microglia.gene.list <-  c( "Fcrls","P2ry12","Cx3cr1", "Trem2", "C1qa" ,"Tmem119") 
+microglia.gene.list <-  c( "Fcrls","P2ry12","Cx3cr1", "Trem2", "C1qa" ,"Tmem119", "Tubb3", "Meg3", "Dcx", "Gfap", "Olig1", "Vtn", 
+                           "F13a1") 
 
 #microglia.gene.list <-  c(  "Cx3cr1", "Ctss", "Tmem119", "Trem2","P2ry12" ,"Cd81" ,"Cst3","Cst7", "Mertk", "Pros1","Siglech", "Sall1", "Hexb", "Fcrls" ) 
 integrated_object$percent.microglia <- PercentageFeatureSet(integrated_object, features = microglia.gene.list )
@@ -131,7 +132,7 @@ Idents(object =  integrated_object) <- integrated_object$seurat_clusters
 # Idents(integrated_object)
 table(Idents(integrated_object))
 
-integrated.strain <- subset(x = integrated_object,idents=c(5, 6, 10, 11, 12, 13, 18))
+integrated.strain <- subset(x = integrated_object,idents=c( 13, 18))
 #integrated_object <- subset(x = integrated.strain, subset = Ctss > 1)
 
 
@@ -172,6 +173,8 @@ ggsave(paste(global_var$global$path_data_prep, "volcano.png",  sep = "/"), units
 DimPlot(integrated.strain, group.by = c("orig.ident", "seurat_clusters"))
 ggsave(paste(global_var$global$path_data_prep, "cluster_for_AZT_&_Veh.png", sep = "/"), units = "in", width = 10, height = 5, dpi = 200)
 
+VlnPlot(integrated.strain, feature = microglia.gene.list, pt.size = 0, assay = "RNA", stack = T, flip = T, fill.by = "ident", split.by = "strain",
+        group.by = "seurat_clusters")
 
 
 
