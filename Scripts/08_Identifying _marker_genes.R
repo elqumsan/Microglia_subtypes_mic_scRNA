@@ -41,6 +41,11 @@ colDnr = colLib[c(1,3,5,7)]
 names(colDnr) = c("BM0", "BM7", "BM9", "BM2")
 colGEX <- c("grey85", brewer.pal(7, "Reds"))
 colCcy = c("black", "blue", "darkorange")
+
+
+colorMedia = c("black", "blue", "magenta")
+names(colorMedia) = c("D21-fm", "D21-nr" , "D21-tr")
+
 os <- import("os")
 ##### Perform Clustering
 
@@ -113,17 +118,19 @@ ggsave(p1 + p2 + plot_layout(guides = "collect"),
 
 
 ####### Proportion / cell number composition per cluster
+
+
 ggData= data.frame(prop.table(table(newObject$orig.ident, newObject$cluster), margin = 2))
 colnames(ggData) <- c("sub_type", "cluster.No", "proportion")
 p1 <- ggplot(ggData, aes(cluster.No, proportion , fill= sub_type)) + 
      geom_col() + xlab("cluster.No") + ylab("proportion of cells (%)") +
-  scale_fill_manual(values = colLib) + plotTheme + coord_flip()
+  scale_fill_manual(values = brewer.pal(9,  "Paired")) + theme_classic(base_size = 18) +  coord_flip()
 
 ggData = data.frame(table(newObject$orig.ident, newObject$cluster))
 colnames(ggData) = c("sub_type", "cluster.No", "proportion")
-p2 <- ggplot(ggData, aes(cluster.No, proportion, fill = sub_type)) +
+p2 <- ggplot(ggData, aes(cluster.No, proportion, fill = sub_type)) + 
   geom_col() + xlab("cluster") + ylab(" Cell Number") +
-  scale_fill_manual(values = colLib) + plotTheme + coord_flip()
+  scale_fill_manual(values = brewer.pal(9,  "Paired")) + theme_classic(base_size = 18) + coord_flip() 
 
 ggsave(p1 + p2 + plot_layout(guides = "collect"),
        width = 10, height = 6,  
