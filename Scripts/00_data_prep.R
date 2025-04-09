@@ -154,6 +154,7 @@ integrated.strain<- integrated.strain %>%
 
 integrated.strain <- JoinLayers(integrated.strain)
 
+Idents(object = integrated.strain) <- integrated.strain$seurat_clusters
 #########
 mg.strain <-what_dims(object_type = integrated.strain, path = global_var$global$Path_QC_Strain_findings, strain = global_var$global$strain , round = global_var$global$round  )
 

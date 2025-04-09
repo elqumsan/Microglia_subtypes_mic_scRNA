@@ -49,7 +49,7 @@ names(colorMedia) = c("D21-fm", "D21-nr" , "D21-tr")
 os <- import("os")
 ##### Perform Clustering
 
-newObject <- FindNeighbors(integrated.strain, dims = 1:20)
+newObject <- FindNeighbors(integrated.strain, dims = 0:12)
 newObject <- FindClusters(newObject, resolution = seq(0.4, 1.5, 0.1))
 
 #### Find ideal resolution
@@ -66,13 +66,16 @@ optRes <- 1.0                           # determined from clustering tree
 newObject$seurat_clusters <- NULL       # Remove this column to prevent confusion 
 newObject$cluster <- newObject[[paste0("RNA_snn_res.", optRes)]]
 
-reorderCluster = c( "4", "9", "12", "13", "20", "14", "16",   # Prog
-                    "17", "10", "18", "23",                   # Ery
-                    "11", "24", "25", "7", "21",             # Myeloid
-                    "22","15","8", "26",                     # B-Lymophoid
-                    "5", "1", "0", "19", "6", "3", "2"     # T-Lymphoid
-                    
-                    )
+
+#reorderCluster = c( "4", "9", "12", "13", "20", "14", "16",   # Prog
+#                    "17", "10", "18", "23",                   # Ery
+#                    "11", "24", "25", "7", "21",             # Myeloid
+#                    "22","15","8", "26",                     # B-Lymophoid
+#                    "5", "1", "0", "19", "6", "3", "2"     # T-Lymphoid
+#                    
+#                   )
+
+reorderCluster = c( "0", "1", "2","3","4","5", "6", "7", "8", "9", "10", "11", "12" )
 
 newObject$cluster<- factor(newObject$cluster, levels = reorderCluster)
 Idents(newObject) <- newObject$cluster # Set Seurat to use optRes
