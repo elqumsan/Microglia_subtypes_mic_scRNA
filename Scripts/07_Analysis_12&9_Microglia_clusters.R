@@ -155,7 +155,8 @@ pt <- table(Idents(integrated.strain), integrated.strain$orig.ident)
 pt <- as.data.frame(pt)
 pt$Var1 <- as.character(pt$Var1)
 
-ggplot(pt, aes(x = Var2, y = Freq, fill = Var1)) +
+
+p <-  ggplot(pt, aes(x = Var2, y = Freq, fill = Var1)) +
   theme_bw(base_size = 15) +
   geom_col(position = "fill", width = 0.5) +
   xlab("Sample") +
@@ -163,20 +164,26 @@ ggplot(pt, aes(x = Var2, y = Freq, fill = Var1)) +
 #  scale_fill_manual(values = brewer.pal( 21, "Paired")) 
  theme(legend.title = element_blank())
 
-cluster_proportions <- table(integrated.strain@active.ident) / ncol(integrated.strain)
+ggsave(p, width = 14, height = 6, filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/precentage_per_cluster.png")
+
+
+cluster_proportions <- table(integrated_object@active.ident) / ncol(integrated_object)
 print(cluster_proportions)
-barplot(cluster_proportions,
+png( filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/cell_proportion_per_cluster.png" )
+ barplot(cluster_proportions,
         xlab = "Cluster",
         ylab = "Proportion of cells",
         main = "cell proportion per Cluster"
         )
 
+dev.off()
 
-
-
-
-ggplot(pt, aes(fill= pt$Var2, y= pt$Freq, x= pt$Var1  )) +
+p <- ggplot(pt, aes(fill= pt$Var2, y= pt$Freq, x= pt$Var1  )) +
   geom_bar(position = "dodge", stat = "identity")
+ggsave(p, width = 14 , height = 6 , 
+       filename = "../Microglia_subtypes_mic_scRNA/findings/04a_microglia_clustering/cell_proportion_per_cluster_2.png")
+
+
  
 ######### Analysis of transcriptomic signature for each cluster, especially for AZT-related clusters (Gene expression analysis)cluster_markers 
 cluster_markers <- FindAllMarkers(integrated.strain, only.pos = TRUE, min.pct = 0.25 , logfc.threshold = 0.25 )
