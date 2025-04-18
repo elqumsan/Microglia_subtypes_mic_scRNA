@@ -47,28 +47,44 @@ library(data.table)
 
 ####### Define color palettes and plot themes
 
-colLib = brewer.pal(2 , "Paired")   # color for libraries
+colLib = c("blue", "darkorange")   # color for libraries
 names(colLib) <- c("Veh", "AZT")
 
-colGEX = c("grey85", brewer.pal(3, "Reds"))
+colGEX = c("grey85", brewer.pal(2, "Reds"))
 colCcy = c("black", "blue", "darkorange")
 plotTheme <- theme_classic(base_size = 18)
+
 inpUMIs <- NULL
 
 ####
 ############# Perform QC - Compute cell QC metrics
 
+#Vehdata.path <- "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/Veh/raw_feature_bc_matrix.h5"
+
+#AZTdata.path <-   "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/AZT/raw_feature_bc_matrix.h5"
+
+#Vehdata  <- Read10X_h5( Vehdata.path)
+#AZTdata <- Read10X_h5( AZTdata.path)
+
+#inpUMIs <- cbind(Vehdata, AZTdata)
+
+
 oupQCcell <- data.table(
             sampleID = colnames(integrated.strain@assays$RNA$scale.data),
-            library = tstrsplit(colnames(integrated.strain@assays$RNA$scale.data), "_")[[1]],
-            nUMI = colSums(integrated.strain@assays$RNA$scale.data),
-            nGene = colSums(integrated.strain@assays$RNA$scale.data != 0), 
-           pctMT = colSums(integrated.strain@assays$RNA$scale.data[grep("^MT-", rownames(integrated.strain@assays$RNA$scale.data)),] )
+            library = tstrsplit(colnames(integrated.strain@assays$RNA$scale.data),"_")[[1]],
+            nUMI = colSums(integrated.strain@assays$RNA$counts),
+            nGene = rowSums(integrated.strain@assays$RNA$counts ), 
+            pctMT = colSums(integrated.strain@assays$RNA$counts[grep("^MT-",rownames(integrated.strain@assays$RNA)),] )
 )
 
 oupQCcell$pctMT <- 100 * oupQCcell$pctMT / oupQCcell$nUMI
 oupQCcell$library <-  factor(oupQCcell$library, levels = names(colLib))
 
+########
+
+
+
+### Plot cell QC metrics
 p1 <- ggplot(oupQCcell, aes(nUMI, fill = library)) + 
   geom_histogram(binwidth = 500, color = "black") + xlim(c(0,40e3)) + 
   geom_vline(xintercept = c(1.5e3,30e3), color = "red", linetype = "dashed")+ 
@@ -78,6 +94,15 @@ p2 <- ggplot(oupQCcell, aes(nGene, fill = library)) +
   geom_histogram(binwidth = 100, color = "black") + xlim(c(0,6e3)) + 
   geom_vline(xintercept = c(0.5e3), color = "red", linetype = "dashed")+ 
   xlab("No. Detected Genes") + scale_fill_manual(values = colLib) + plotTheme
+
+p3 <- ggplot(oupQCcell, aes(pctMT, fill = library)) + 
+  geom_histogram(binwidth = 0.5, color = "black") + xlim(c(0,20)) + 
+  geom_vline(xintercept = c(15), color = "red", linetype = "dashed")+ 
+  xlab("Percentage MT Genes") + scale_fill_manual(values = colLib) + plotTheme
+
+
+ggsave(p1 + p2 + p3 + guide_area() + plot_layout(nrow = 2, guides = "collect"), 
+       width = 10, height = 8, filename = "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/basicCellQC.png")
 
 ###################
 
