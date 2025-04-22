@@ -105,7 +105,49 @@ ggsave(p1 + p2 + p3 + guide_area() + plot_layout(nrow = 2, guides = "collect"),
        width = 10, height = 8, filename = "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/basicCellQC.png")
 
 ###################
+######  Remove Low quality cells ()
 
+oupQCcell <- oupQCcell[nUMI > 1.5e3]
+oupQCcell <- oupQCcell[nUMI < 30e3]
+oupQCcell <- oupQCcell[nGene > 0.5e3]
+oupQCcell <- oupQCcell[pctMT < 15]
+inpUMIs <- integrated.strain@assays$RNA$counts[,as.character(oupQCcell$sampleID)]
+
+###########
+### Compute gene QC metrics
+inpUMIs <- inpUMIs[rowSums(inpUMIs) > 0, ]  # Remove genes with no reads
+
+oupQCgene <- data.table(
+              gene = rownames(inpUMIs),
+              meanRead = rowSums(inpUMIs) / ncol(inpUMIs),
+              cellExpr = rowSums(inpUMIs > 0),
+              library = tstrsplit(colnames(inpUMIs),"_")[[1]]
+)
+
+oupQCgene$log10meanRead <- log10(oupQCgene$meanRead)
+oupQCgene$log10cellExpr <- log10(oupQCgene$cellExpr)
+
+### Plot gene QC metrics
+p1 <- ggplot(oupQCgene, aes(log10meanRead, fill = library)) + 
+  geom_histogram(binwidth = 0.05, color = "black") +
+  xlab("log10(Average UMIs)") + plotTheme
+
+p2 <- ggplot(oupQCgene[cellExpr != 0], aes(log10cellExpr, fill = library) ) + 
+  geom_histogram(binwidth = 0.05 , color = "black") + 
+  geom_vline(xintercept = log10(8), color = "red", linetype = "dashed") +
+  xlab ("log10(No. Cells Expression gene)" ) + plotTheme
+
+ggsave(p1 +p2, width = 10 , height = 4, filename = "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/basicGeneQC.png")
+
+#### Remove Lowly expressed genes (24660 genes down to 19677 genes post - QC )
+
+oupQCgene <- oupQCgene [cellExpr >= 8]
+inpUMIs <- inpUMIs[as.character(oupQCgene$gene),]
+
+
+
+
+#####
 dim(meta)
 head(meta)
 
