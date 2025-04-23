@@ -6,6 +6,7 @@ library(extrafont)
 library(stringr)
 library('tidyr')
 library(data.table)
+library(dplyr)
 
 # 1. QC for merged data
 
@@ -111,6 +112,10 @@ oupQCcell <- oupQCcell[nUMI > 1.5e3]
 oupQCcell <- oupQCcell[nUMI < 30e3]
 oupQCcell <- oupQCcell[nGene > 0.5e3]
 oupQCcell <- oupQCcell[pctMT < 15]
+
+integrated.strain <- JoinLayers(integrated.strain) 
+
+
 inpUMIs <- integrated.strain@assays$RNA$counts[,as.character(oupQCcell$sampleID)]
 
 ###########
@@ -139,15 +144,53 @@ p2 <- ggplot(oupQCgene[cellExpr != 0], aes(log10cellExpr, fill = library) ) +
 
 ggsave(p1 +p2, width = 10 , height = 4, filename = "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/basicGeneQC.png")
 
-#### Remove Lowly expressed genes (24660 genes down to 19677 genes post - QC )
+#### Remove Lowly expressed genes (23130 genes down to 19064 genes post - QC )
 
 oupQCgene <- oupQCgene [cellExpr >= 8]
 inpUMIs <- inpUMIs[as.character(oupQCgene$gene),]
 
+########## Create Seurat object + Preprocessing 
+### Create Seurat Object
+### nCount_RNA = & no. UMI count ; nFeature_RNA = no. detected genes
+### We will also compute percentage MT genes here and set the library
 
+seu <- CreateSeuratObject(inpUMIs, project = "Just Microglia")
+colnames(seu@meta.data)
+seu$pctMT <- 100 * colSums(inpUMIs[grep("^MT-", rownames(inpUMIs)),])
 
+seu$pctMT <- seu$pctMT / seu$nCount_RNA
 
-#####
+#### Create library and donor column
+seu$library = factor(seu$orig.ident, levels = names(colLib))
+Idents(seu) <- seu$library
+seu$donor <- gsub("pos|neg" , "" , seu$library)
+seu$donor = factor(seu$donor)
+
+##### Normalization + Feature selection
+seu <- NormalizeData(seu, assay = "RNA")
+seu <-FindVariableFeatures(seu, selection.method = "vst"  )
+
+top10 <- head(VariableFeatures(seu), 20)
+##### Plot gene expression mean vs variance
+ggData = as.data.frame( as.matrix( seu[["RNA"]]@meta.data))
+
+# ggData = as.data.frame(seu@assays$RNA)
+
+p1 <- VariableFeaturePlot(seu)
+p2 <- LabelPoints(plot = p1, points = top10, repel = TRUE) 
+p1 + p2 
+
+ggsave(p1 + p2 + plot_layout(guides = "collect"),
+       width = 20, height = 10, filename =  "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/basicHVG.png")
+
+p1 <- ggplot(ggData, aes(vf_vst_counts_mean, vf_vst_counts_variance, color = vf_vst_counts_variable)) + 
+  geom_point() + scale_color_manual(values = c("black", "firebrick")) + 
+  geom_line(aes(vf_vst_counts_mean, vf_vst_counts_variance.expected), color = "dodgerblue") + 
+  xlab("Average Expression") + ylab("Gene Variance") +
+    plotTheme
+  
+  
+#############
 dim(meta)
 head(meta)
 
