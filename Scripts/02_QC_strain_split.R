@@ -57,6 +57,7 @@ plotTheme <- theme_classic(base_size = 18)
 
 inpUMIs <- NULL
 
+integrated.strain <- integrated_object
 ####
 ############# Perform QC - Compute cell QC metrics
 
@@ -183,13 +184,53 @@ p1 + p2
 ggsave(p1 + p2 + plot_layout(guides = "collect"),
        width = 20, height = 10, filename =  "../Microglia_subtypes_mic_scRNA/findings/01a_QC_strains/basicHVG.png")
 
-p1 <- ggplot(ggData, aes(vf_vst_counts_mean, vf_vst_counts_variance, color = vf_vst_counts_variable)) + 
-  geom_point() + scale_color_manual(values = c("black", "firebrick")) + 
-  geom_line(aes(vf_vst_counts_mean, vf_vst_counts_variance.expected), color = "dodgerblue") + 
-  xlab("Average Expression") + ylab("Gene Variance") +
-    plotTheme
-  
-  
+#p1 <- ggplot(ggData, aes(vf_vst_counts_mean, vf_vst_counts_variance, color = vf_vst_counts_variable)) + 
+#  geom_point() + scale_color_manual(values = c("black", "firebrick")) + 
+#  geom_line(aes(vf_vst_counts_mean, vf_vst_counts_variance.expected), color = "dodgerblue") + 
+#  xlab("Average Expression") + ylab("Gene Variance") +
+#    plotTheme
+ 
+####### PCA / tSNE / UMAP dimension reduction
+seu <- ScaleData(object = seu)  ### Scale data prior to PCA
+seu <- RunPCA(seu)
+ 
+p1 <- DimPlot(seu, reduction = "pca", pt.size = 0.1, shuffle = TRUE,
+               cols = colLib) + plotTheme + coord_fixed()  
+p2 <- DimPlot(seu, reduction = "pca", pt.size = 0.1, shuffle = TRUE,
+              cols = colLib, dims = c(1,3)) + plotTheme + coord_fixed()
+
+
+###### Elbow plot
+p1 <- ElbowPlot(seu, ndims = 40)
+ggData <- seu@reductions[["pca"]]@stdev  # fit lines for elbo plot
+lm(y~x, data = data.frame(x = 16:20 , y = ggData[16:20]))
+lm(y~x , data = data.frame(x= 31:35 , y=ggData[31:35]) )
+nPC <- 20 ## determined from elbow plot
+p1 <- p1 + plotTheme + geom_vline(xintercept = nPC, color = "firebrick") + 
+  geom_path(data = data.frame(x= 16:35, y = 16:35*-0.07879 + 3.84064) ,
+            aes(x,y) , color = "dodgerblue") + 
+  geom_path(data = data.frame(x = 16:35 , y= 16:35* -0.02506 + 2.64554) , 
+            aes(x,y) , color = "dodgerblue")
+
+ggsave(p1 , width = 5 , height = 4 , filename = "../Microglia_subtypes_mic_scRNA/findings/02_QC_strain_split/basicPCAelbow.png")
+
+## Run tSNE 
+seu <- RunTSNE(seu , dims = 1:nPC , num_threads = nPC)
+p1 <- DimPlot(seu, reduction = "tsne", pt.size = 0.1, shuffle = TRUE, cols = colLib) + plotTheme + coord_fixed()
+
+
+### RUN UUMAP
+seu <- RunUMAP(seu, dims = 1:nPC)
+p2 <- DimPlot(seu ,  reduction = "umap", pt.size = 0.1 , shuffle = TRUE,
+              cols =  colLib) + plotTheme + coord_fixed()
+
+ggsave(p1 + p2 + plot_layout(guides = "collect"), width = 10 , height = 4 , filename = "../Microglia_subtypes_mic_scRNA/findings/02_QC_strain_split/basicUmapGex.png")
+
+### plot some genes from literature
+p1 <- FeaturePlot(seu, reduction = "pca", pt.size = 0.1,
+            features =  c( "Fcrls","P2ry12","Cx3cr1", "Trem2", "C1qa" ,"Tmem119", "Tubb3", "Meg3", "Dcx", "Gfap", "Olig1", "Vtn", 
+                           "F13a1"), order = TRUE) &
+  scale_color_gradientn(colours = colGEX) & plotTheme & coord_fixed()
 #############
 dim(meta)
 head(meta)
