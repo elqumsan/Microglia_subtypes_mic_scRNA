@@ -35,8 +35,8 @@ library(gProfileR)
 
 #### Define color palettes and plot themes
 plotTheme <- theme_classic(base_size = 18)
-colLib = brewer.pal(7,  "Paired")
-names(colLib)= c("BM0pos", "BM0neg", "BM7pos", "BM7eng", "BM9pos", "BM9neg", "BM2pos")
+colLib = brewer.pal(2,  "Paired")
+names(colLib)= c("Veh", "AZT")
 colDnr = colLib[c(1,3,5,7)]
 names(colDnr) = c("BM0", "BM7", "BM9", "BM2")
 colGEX <- c("grey85", brewer.pal(7, "Reds"))

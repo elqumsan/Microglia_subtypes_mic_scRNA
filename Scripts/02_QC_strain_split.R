@@ -57,7 +57,7 @@ plotTheme <- theme_classic(base_size = 18)
 
 inpUMIs <- NULL
 
-integrated.strain <- integrated_object
+integrated.strain <- integrated.strain
 ####
 ############# Perform QC - Compute cell QC metrics
 
@@ -155,7 +155,7 @@ inpUMIs <- inpUMIs[as.character(oupQCgene$gene),]
 ### nCount_RNA = & no. UMI count ; nFeature_RNA = no. detected genes
 ### We will also compute percentage MT genes here and set the library
 
-seu <- CreateSeuratObject(inpUMIs, project = "Just Microglia")
+seu <- CreateSeuratObject(counts =inpUMIs, project = "Just Microglia")
 colnames(seu@meta.data)
 seu$pctMT <- 100 * colSums(inpUMIs[grep("^MT-", rownames(inpUMIs)),])
 
@@ -217,6 +217,7 @@ ggsave(p1 , width = 5 , height = 4 , filename = "../Microglia_subtypes_mic_scRNA
 ## Run tSNE 
 seu <- RunTSNE(seu , dims = 1:nPC , num_threads = nPC)
 p1 <- DimPlot(seu, reduction = "tsne", pt.size = 0.1, shuffle = TRUE, cols = colLib) + plotTheme + coord_fixed()
+
 
 
 ### RUN UUMAP
