@@ -50,7 +50,7 @@ os <- import("os")
 ##### Perform Clustering
 
 newObject <- FindNeighbors(integrated.strain, dims = 0:12)
-newObject <- FindClusters(newObject, resolution = seq(0.4, 1.5, 0.1))
+newObject <- FindClusters(newObject, resolution = seq( 1.0 ,1.5, 0.1))
 
 #### Find ideal resolution
  p1 <-clustree::clustree(newObject)
@@ -176,7 +176,7 @@ ggsave(p2, width = 10, height = 8 , filename = "../Microglia_subtypes_mic_scRNA/
 oupMarkerFunc = data.table()
 set.seed(42)
 
-for (iDB in c("c8", "C5_GO:BP")) {
+for (iDB in c("M8", "M5_GO:BP")) {
 # Get reference gene set from msigdbr  
   inpGS <- tstrsplit(iDB, "_")
   msigCat <- inpGS[[1]] ;  msigSubCat <- NULL
@@ -200,7 +200,9 @@ oupMarkerFunc$cluster <- factor(oupMarkerFunc$cluster, levels = reorderCluster)
 newObject@misc$markerFunc <- oupMarkerFunc ## store func analysis into Seurat object 
 
 #### plot functional analysis results
-ggData <- oupMarkerFunc[grep("BONE_MARROW",ID)]
+ggData <- oupMarkerFunc[grep("CHARAFE_BREAST_CANCER_LUMINAL_VS_MESENCHYMAL_DN",ID)]
+ggData$ID <- gsub("HAY_BONE_MARROW", "", ggData$ID)
+ggData$ID <- factor(ggData$ID, levels = unique(ggData$ID))
 
 ggplot(ggData, aes(cluster, ID, size = Count, color = mLog10Padj)) +
   geom_point() + theme_linedraw(base_size = 18) +
