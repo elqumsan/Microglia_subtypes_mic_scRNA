@@ -263,3 +263,5 @@ colnames(newObject@meta.data) [grep("HALLMARK" , colnames(newObject@meta.data))]
 
 p1 <- FeaturePlot(newObject, reduction = "umap", pt.size = 0.1 , features = names(inpGS), order = TRUE ) &
   scale_color_distiller(palette = "RdY1Bu") & plotTheme & coord_fixed()
+
+ggsave(p1, width = 20 , height = 12, filename= "../Microglia_subtypes_mic_scRNA/findings/08_identifying_marker_genes/clustModuScore.png")
