@@ -151,6 +151,8 @@ fwrite(oupMarker, sep = "\t", file = "../Microglia_subtypes_mic_scRNA/findings/0
 
 
 #### Check if known genes are  in the marker gene list
+KnownGenes <- c("Tmem119", "P2ry12", "Cx3cr1", "Trem2", "Sall1", "Aif1","Iba1", "Apoe", "Lpl", "Trem2", "Cst7" , "Itgax","CD11c", "Ifitm3",
+                "B2m","Siglech", "Pu.1", "Irf8", "Sall1", "Runx1")
 KnownGenes <- c("Cst7",  "Apoe", "Cx3cr1", "Tmem119", "Ifit3", "Ifitm3", "Irf7", "Hexb", "Cd81", "Cst3", "Rplp1", "Rps21", "Rps24" 
                 , "C3ar1", "Stmn1", "Top2a", "Birc5")
 oupMarker[gene %in% KnownGenes]
@@ -176,13 +178,17 @@ ggsave(p2, width = 10, height = 8 , filename = "../Microglia_subtypes_mic_scRNA/
 oupMarkerFunc = data.table()
 set.seed(42)
 
-for (iDB in c("M8", "M5_GO:BP")) {
+for (iDB in c("C8", "C5_GO:BP")) {
 # Get reference gene set from msigdbr  
   inpGS <- tstrsplit(iDB, "_")
   msigCat <- inpGS[[1]] ;  msigSubCat <- NULL
   if (length(inpGS) >= 2) { msigSubCat <- inpGS[[2]]}
   
-  inpGS <- data.frame(msigdbr( species = "mouse", category = "C2", subcategory = "CGP" ))
+#  inpGS <- data.frame(msigdbr( species = "mouse", category = "C2", subcategory = "CGP" ))
+  inpGS <- data.frame(msigdbr( species = "Mus musculus", category = msigCat, subcategory = msigSubCat  ))
+  
+  #  inpGS <- data.frame(msigdbr( species = "Mus musculus", category ="M2", subcategory = "CGP" ))
+  
   
   inpGS <- inpGS[, c("gs_name", "gene_symbol")]
   
@@ -200,12 +206,60 @@ oupMarkerFunc$cluster <- factor(oupMarkerFunc$cluster, levels = reorderCluster)
 newObject@misc$markerFunc <- oupMarkerFunc ## store func analysis into Seurat object 
 
 #### plot functional analysis results
-ggData <- oupMarkerFunc[grep("CHARAFE_BREAST_CANCER_LUMINAL_VS_MESENCHYMAL_DN",ID)]
-ggData$ID <- gsub("HAY_BONE_MARROW", "", ggData$ID)
+ggData <- oupMarkerFunc[grep("MANNO_MIDBRAIN_NEUROTYPES_HRGL1",ID)]
+ggData$ID <- gsub("brain-resident macrophages", "", ggData$ID)
 ggData$ID <- factor(ggData$ID, levels = unique(ggData$ID))
 
-ggplot(ggData, aes(cluster, ID, size = Count, color = mLog10Padj)) +
-  geom_point() + theme_linedraw(base_size = 18) +
+p1 <- ggplot(ggData, aes(cluster, ID, size = Count, color = mLog10Padj)) +
+  geom_point() + ggtitle("Brain-resident macrophages")+
+  theme_linedraw(base_size = 18) +
   theme(axis.text.x = element_text(angle = -45, hjust = 0)) + 
   scale_color_gradientn(colours = colGEX, limits = c(0, 10), na.value = colGEX[8])
 
+ggsave(p1, width = 12,height = 8, filename = "../Microglia_subtypes_mic_scRNA/findings/08_identifying_marker_genes/clustMarkersFuncMB.png")
+
+
+
+tmp <- oupMarkerFunc[sigdb == "C5_GO:BP"]
+tmp <-tmp[grep("DIFF", ID)][!grep("POSITIVE|NEGATIVE", ID)]$ID
+ggData <- oupMarkerFunc[ID %in% tmp]
+ggData$ID <- factor(ggData$ID, levels = unique(ggData$ID))
+
+p1 <- ggplot(ggData, aes(cluster, ID, size= Count, color = mLog10Padj)) + 
+  geom_point() + ggtitle(" DIFF signatures") + 
+  theme_linedraw(base_size = 18) +
+  theme(axis.text.x = element_text(angle =-45, hjust = 0 )) +
+  scale_colour_gradientn(colours = colGEX, limits = c(0, 8), na.value = colGEX[8])
+
+ggsave(p1, width = 12 , height = 10 , filename= "../Microglia_subtypes_mic_scRNA/findings/08_identifying_marker_genes/clustMarkersFuncDiff.png")
+
+
+##### cell cycle + plot on UMAP
+newObject <- CellCycleScoring(newObject, s.features = cc.genes$s.genes, g2m.features = cc.genes$g2m.genes )
+p1 <- DimPlot(newObject, reduction = "umap", pt.size = 0.1, group.by = "cluster",
+              shuffle = TRUE , cols = colCls ) + plotTheme + coord_fixed()
+
+p2 <- DimPlot(newObject, reduction = "umap", pt.size = 0.1 , group.by = "Phase", 
+        shuffle = TRUE, cols = colCcy ) + plotTheme + coord_fixed()
+
+p3 <- FeaturePlot(newObject, pt.size = 0.1,  feature ="S.Score") + 
+      scale_color_distiller( palette = "RdY1Bu") + plotTheme + coord_fixed()
+
+p4 <- FeaturePlot(newObject, pt.size = 0.1, feature = "G2M.Score") + scale_color_distiller( palette = "RdY1Bu") +
+     plotTheme + coord_fixed()
+
+ggsave(p1 + p2 + p3 + p4 , width = 10, height = 8 , 
+       filename = "../Microglia_subtypes_mic_scRNA/findings/08_identifying_marker_genes/clusModuCellCycle.png")
+
+
+### Add module score (Here I use using HallMark Signaling gene sets)
+inpGS <- data.table(msigdbr(species = "Homo sapiens" , category = "H"))
+inpGS <- inpGS[grep("SIGNAL", gs_name)]
+inpGS$gs_name <- gsub("HALLMARK", "", inpGS$gs_name)
+inpGS$gs_name <- gsub("_SIGNALING" , "", inpGS$gs_name)
+inpGS <- split(inpGS$gene_symbol , inpGS$gs_name)
+newObject <- AddModuleScore(newObject, feature = inpGS , name = "HALLMARK")
+colnames(newObject@meta.data) [grep("HALLMARK" , colnames(newObject@meta.data))] <- names(inpGS)
+
+p1 <- FeaturePlot(newObject, reduction = "umap", pt.size = 0.1 , features = names(inpGS), order = TRUE ) &
+  scale_color_distiller(palette = "RdY1Bu") & plotTheme & coord_fixed()
