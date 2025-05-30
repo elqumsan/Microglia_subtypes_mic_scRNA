@@ -147,6 +147,8 @@ oupMarker <- FindAllMarkers(newObject, only.pos = TRUE , logfc.threshold =1.0,  
 oupMarker <- data.table(oupMarker)
 oupMarker$pct.diff = oupMarker$pct.1 - oupMarker$pct.2 
 oupMarker <-oupMarker[,c("cluster", "gene", "avg_log2FC", "pct.1", "pct.2", "pct.diff", "p_val", "p_val_adj")]
+
+
 fwrite(oupMarker, sep = "\t", file = "../Microglia_subtypes_mic_scRNA/findings/06_differential_expression_analysis/clusterMarkers.txt")
 
 
@@ -201,7 +203,9 @@ for (iDB in c("C8", "C5_GO:BP")) {
     oupMarkerFunc <- rbindlist(list(oupMarkerFunc, tmpOut))
       }
   
-}
+} ### end of iDB for loop
+
+
 oupMarkerFunc$cluster <- factor(oupMarkerFunc$cluster, levels = reorderCluster)
 newObject@misc$markerFunc <- oupMarkerFunc ## store func analysis into Seurat object 
 
@@ -223,6 +227,7 @@ ggsave(p1, width = 12,height = 8, filename = "../Microglia_subtypes_mic_scRNA/fi
 tmp <- oupMarkerFunc[sigdb == "C5_GO:BP"]
 tmp <-tmp[grep("DIFF", ID)][!grep("POSITIVE|NEGATIVE", ID)]$ID
 ggData <- oupMarkerFunc[ID %in% tmp]
+substr(gsub("GOBP_", "", ggData$ID), 1 , 30)
 ggData$ID <- factor(ggData$ID, levels = unique(ggData$ID))
 
 p1 <- ggplot(ggData, aes(cluster, ID, size= Count, color = mLog10Padj)) + 
@@ -253,7 +258,7 @@ ggsave(p1 + p2 + p3 + p4 , width = 10, height = 8 ,
 
 
 ### Add module score (Here I use using HallMark Signaling gene sets)
-inpGS <- data.table(msigdbr(species = "Homo sapiens" , category = "H"))
+inpGS <- data.table(msigdbr(species = "Mus musculus" , category = "H"))
 inpGS <- inpGS[grep("SIGNAL", gs_name)]
 inpGS$gs_name <- gsub("HALLMARK", "", inpGS$gs_name)
 inpGS$gs_name <- gsub("_SIGNALING" , "", inpGS$gs_name)
