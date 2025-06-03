@@ -71,7 +71,7 @@ integrated_object$strain <- str_replace(integrated_object$strain, pattern ="Micr
 meta <- integrated_object@meta.data
 
 meta_tidy <- meta %>% 
-  select(orig.ident,nCount_RNA, nFeature_RNA, strain) %>%
+  dplyr::select(orig.ident,nCount_RNA, nFeature_RNA, strain) %>%
   gather(-orig.ident, -strain ,key= "QC", value="value" )
 #VlnPlot(object.ref, features = c("nFeature_RNA","nCount_RNA" ) )
 
