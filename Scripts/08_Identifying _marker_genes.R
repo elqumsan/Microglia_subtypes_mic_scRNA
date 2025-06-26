@@ -187,7 +187,7 @@ for (iDB in c("C8", "C5_GO:BP")) {
   if (length(inpGS) >= 2) { msigSubCat <- inpGS[[2]]}
   
 #  inpGS <- data.frame(msigdbr( species = "mouse", category = "C2", subcategory = "CGP" ))
-  inpGS <- data.frame(msigdbr( species = "Mus musculus", category = msigCat, subcategory = msigSubCat  ))
+  inpGS <- data.frame(msigdbr( species = "Mus musculus", collection = msigCat, subcollection = msigSubCat  ))
   
   #  inpGS <- data.frame(msigdbr( species = "Mus musculus", category ="M2", subcategory = "CGP" ))
   
@@ -258,15 +258,57 @@ ggsave(p1 + p2 + p3 + p4 , width = 10, height = 8 ,
 
 
 ### Add module score (Here I use using HallMark Signaling gene sets)
-inpGS <- data.table(msigdbr(species = "Mus musculus" , category = "H"))
+inpGS <- data.table(msigdbr(species = "Mus musculus" , collection = "C8"))
 inpGS <- inpGS[grep("SIGNAL", gs_name)]
 inpGS$gs_name <- gsub("HALLMARK", "", inpGS$gs_name)
 inpGS$gs_name <- gsub("_SIGNALING" , "", inpGS$gs_name)
 inpGS <- split(inpGS$gene_symbol , inpGS$gs_name)
+
 newObject <- AddModuleScore(newObject, feature = inpGS , name = "HALLMARK")
+
 colnames(newObject@meta.data) [grep("HALLMARK" , colnames(newObject@meta.data))] <- names(inpGS)
 
 p1 <- FeaturePlot(newObject, reduction = "umap", pt.size = 0.1 , features = names(inpGS), order = TRUE ) &
   scale_color_distiller(palette = "RdY1Bu") & plotTheme & coord_fixed()
 
 ggsave(p1, width = 20 , height = 12, filename= "../Microglia_subtypes_mic_scRNA/findings/08_identifying_marker_genes/clustModuScore.png")
+
+
+###### Annotating clusters
+
+oupAnnot = data.table(cluster = reorderCluster)
+## Add in top 5 marker genes
+ggData <- oupMarker[, head(.SD, 8), by = "cluster"]
+ggData <- ggData[,paste0(gene, collapse = ","), by = "cluster"]
+colnames(ggData)[2] <- "markers"
+oupAnnot <- ggData[oupAnnot, on = "cluster"]
+
+### Add in Microglia_Homeostatic enrichment
+ggData <- oupMarkerFunc[grep("BONE_MARROW", ID)][, head(.SD, 1), by = "cluster"]
+ggData <- ggData[, c("cluster" , "ID")]
+ggData$ID <-gsub("HAY_BONE_MARROW_" , "", ggData$ID)
+colnames(ggData)[2] <- "HAY_BONE_MARROW"
+oupAnnot <- ggData[oupAnnot, on = "cluster"]
+
+## Add in annotation
+
+oupAnnot$annotation <- c("HSC","MPP","MyP1","MyP2","LyP1","LyP2","ProB",
+                         "ERP","Ery","MKP","EOBM",
+                         "pDC1","pDC2","cDC","Monocyte","InflamMono","Stroma",
+                         "PreB","MemoryB","MatureB","BT","PlasmaCell",
+                         "CD8+Naive","CD4+Naive","CD4+TCM",
+                         "CD8+GZMK1","CD8+GZMK2","CD8+TEMRA","NK")
+  
+#  rep(c("HSC","MPP","MyP1","MyP2","LyP1","LyP2","ProB"), nrow(oupAnnot))
+
+## output table
+png("../Microglia_subtypes_mic_scRNA/findings/08_identifying_marker_genes/clustReAnnotTable.png", width = 12, height = 9, units = "in" 
+    , res = 300 )
+p1 <-tableGrob(oupAnnot, rows = NULL)
+grid.arrange(p1)
+dev.off()
+
+### Add new annotation into seurat and replot
+tmpMap <- oupAnnot$annotation
+names(tmpMap) <- oupAnnot$cluster
+newObject$celltype <- tmpMap[newObject@assays$RNA, on = "cluster"]
