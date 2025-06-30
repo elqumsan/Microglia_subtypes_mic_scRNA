@@ -4,9 +4,9 @@ global: ## Global parameters are those who are the same across all study cases
 
   dir: ## Directories
   path_in: 
-  Vehdata.path: "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/Veh/"
+  Vehdata.path: "/shared/home/mabuelqumsan/TANG_Lab/Xin_data/Veh/"
   Veh_Project:  "Veh_data_Microglia"
-  AZTdata.path: "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/AZT/"
+  AZTdata.path: "/shared/home/mabuelqumsan/TANG_Lab/Xin_data/AZT/"
   AZT_Project:  "AZT_data_Microglia"
   path_out: "../Microglia_subtypes_mic_scRNA/findings/"
   path_data_prep: "../Microglia_subtypes_mic_scRNA/findings/00_data_prep"

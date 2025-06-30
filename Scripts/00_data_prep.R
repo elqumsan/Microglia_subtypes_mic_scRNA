@@ -38,12 +38,12 @@ global_var <- read_yaml(file = "../Microglia_subtypes_mic_scRNA/00_project_param
 #source("../Microglia_subtypes_mic_scRNA-/Functions/norm_scale_dim_cluster_qc.R")
 #source("../Microglia_subtypes_mic_scRNA-/scripts/02_QC_starin_split.R")
 
-Vehdata.path <- "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/Veh/"
+Vehdata.path <- "/shared/home/mabuelqumsan/TANG_Lab/Xin_data/Veh/"
 
 #Vehdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/Veh/")
 #Veh_Project <- "WT_data_Microglia"
 
-AZTdata.path <-   "/shared/home/mabuelqumsan/rnaseqmva_shared_space/TANG_Lab/Xin_data/AZT/"
+AZTdata.path <-   "/shared/home/mabuelqumsan/TANG_Lab/Xin_data/AZT/"
 
 # AZTdata.path <- ("/shared/ifbstor1/projects/rnaseqmva/TANG_Lab/Xin_data/AZT/")
 # AZT_Project <-  "AZT_data_Microglia"
