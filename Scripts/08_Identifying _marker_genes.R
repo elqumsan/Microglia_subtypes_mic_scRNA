@@ -32,6 +32,7 @@ library(enrichR)
 library(clusterProfiler)
 library(gProfileR)
 
+library(org.Mm.eg.db)
 
 #### Define color palettes and plot themes
 plotTheme <- theme_classic(base_size = 18)

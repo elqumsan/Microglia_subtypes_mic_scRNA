@@ -161,7 +161,7 @@ mg.strain <-what_dims(object_type = integrated.strain, path = global_var$global$
 cells <- WhichCells(integrated.strain)
 
 CellsMeta = integrated.strain@meta.data
-randomnumbers <- runif(4338, 0.0, 1.1)
+randomnumbers <- runif(681, 0.0, 1.1)
 CellsMeta["Gene_IDs"] <- randomnumbers
 head(CellsMeta)
 cellsMetaTrim <- subset(CellsMeta, select = c("Gene_IDs"))
