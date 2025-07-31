@@ -16,9 +16,8 @@ library(reticulate)
 library(pdist)
 library(phateR)
 library(SeuratWrappers)
-library(monocle3)
 library(slingshot)
-library(tradeSeq)
+
 library(pheatmap)
 library(clusterProfiler)
 library(msigdbr)
@@ -29,7 +28,9 @@ library(ExperimentHub)
 library(GSEABase)
 library(enrichR)
 
-library(clusterProfiler)
+library(monocle3)
+library(tradeSeq)
+
 library(gProfileR)
 
 library(org.Mm.eg.db)
