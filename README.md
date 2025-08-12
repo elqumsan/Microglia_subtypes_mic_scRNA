@@ -37,7 +37,7 @@ The Microglia_subtypes_mic_scRNA R package provides a reproducible workflow for 
    - UMAP plots, violin plots, dot plots, heatmaps, and subtype abundance barplots
 
 ## Installation      
-# Install from GitHub
+### Install from GitHub
 if(!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 
