@@ -1,27 +1,35 @@
 # Microglia_subtypes_mic_scRNA 
 scRNA_seq on microglia from wild-derived HIV's mouse model
 
-Title:
-Microglia_subtypes_mic_scRNA: Identification and Characterization of Microglial Subtypes from scRNA-seq Data
+Identification and Characterization of Microglial Subtypes from scRNA-seq Data
 
-Description:
-The Microglia_subtypes_mic_scRNA R package provides a reproducible workflow for processing, analyzing, and visualizing single-cell RNA sequencing (scRNA-seq) data of microglia, with a specific application to studies on antiretroviral drug (AZT)-induced neuropathic pain.
+The Microglia_subtypes_mic_scRNA R package provides a reproducible workflow for processing, analyzing, and visualizing single-cell RNA sequencing (scRNA-seq) data of microglia, with a specific focus on understanding antiretroviral drug (AZT)-induced neuropathic pain.
 
-The package implements end-to-end scRNA-seq analysis, including:
+This package was developed for the analyses presented in:
 
-Raw Data Processing: Import of Cell Ranger outputs (.h5, matrix.mtx) with automated QC, doublet removal, and filtering of low-quality cells.
-
-Normalization & Integration: Single-cell–specific normalization methods (SCTransform, log-normalization) and batch integration using Seurat, Harmony, or Liger.
-
-Dimensionality Reduction & Clustering: PCA, UMAP/t-SNE projections, and community detection for identifying microglia subpopulations.
-
-Cell Type Annotation: Semi-automated annotation using marker gene databases (SingleR, scCATCH) and curated microglia-specific markers.
-
-Differential Expression & Functional Enrichment: DEG identification between conditions (WT vs. AZT), pain-related gene prioritization, and pathway analysis (IPA, GSEA).
-
-Publication-Ready Visualizations: Violin plots, dot plots, cluster heatmaps, and subtype abundance bar charts.
-
-Target Audience:
-Researchers studying microglia biology, neuroinflammation, neuropathic pain, HIV-associated neurological disorders, or anyone interested in scRNA-seq workflows for CNS immune cell populations.
+Elqumsan M, Li X, Tang S-J. Identification of Dysregulated Microglia Subtypes Induced by Antiretroviral Drug AZT Using Single-Cell RNA Sequencing. [Manuscript in preparation].
 
 
+## Features
+- Raw Data Processing
+  - Import Cell Ranger output (.h5, .mtx)
+  - Quality control: filter low-quality cells and remove doublets
+
+- Normalization & Integration
+   - SCTransform-based normalization
+   - Batch correction via Harmony or Liger
+
+- Dimensional Reduction & Clustering
+   - PCA, UMAP
+   - Graph-based clustering to identify subpopulations
+
+- Cell Type Annotation
+   -  Marker-based annotation
+   - Automated annotation via SingleR and scCATCH
+
+- Differential Expression & Functional Enrichment
+   - Subtype-specific DEG analysis
+   - Pathway enrichment via IPA and GSEA
+
+- Publication-Ready Visualizations
+   - UMAP plots, violin plots, dot plots, heatmaps, and subtype abundance barplots
