@@ -37,29 +37,36 @@ The Microglia_subtypes_mic_scRNA R package provides a reproducible workflow for 
    - UMAP plots, violin plots, dot plots, heatmaps, and subtype abundance barplots
 
 ## Installation      
-### Install from GitHub
+
+```
+#### Install from GitHub
+
 if(!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 
 devtools::install_github("elqumsan/Microglia_subtypes_mic_scRNA")
-
-## Usage
+```
+```
+#### Usage
 library(Microglia_subtypes_mic_scRNA)
-
-## Load example data
+```
+```
+##### Load example data
 data_dir <- system.file("extdata", package = "Microglia_subtypes_mic_scRNA")
-
+```
+```
 ## Run complete workflow
 results <- run_microglia_analysis(
     data_path = data_dir,
     integration_method = "Harmony",
     annotation_method = "SingleR"
 )
-
+```
+```
 ## Visualize results
 plot_umap(results)
 plot_subtype_abundance(results)
-
+```
 ## Requirements
 - R (>= 4.5.1)
 - Key dependencies: Seurat, SingleR, scCATCH, harmony, liger, DoubletFinder, SoupX
@@ -71,9 +78,10 @@ Example datasets are provided for demonstration and testing purposes
 
 ## Running All Analyses
 To reproduce the entire analysis pipeline from the manuscript 
-r
-source(system.file("scripts", "full_analysis.R", package = "Microglia_subtypes_mic_scRNA"))
 
+```
+source(system.file("scripts", "full_analysis.R", package = "Microglia_subtypes_mic_scRNA"))
+```
 ## Materials & Methods
 Detailed analysis steps, QC thresholds, and parameter setting are described in the supplementary materials section of the manuscript.
 
