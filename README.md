@@ -46,17 +46,17 @@ devtools::install_github("elqumsan/Microglia_subtypes_mic_scRNA")
 ## Usage
 library(Microglia_subtypes_mic_scRNA)
 
-# Load example data
+## Load example data
 data_dir <- system.file("extdata", package = "Microglia_subtypes_mic_scRNA")
 
-# Run complete workflow
+## Run complete workflow
 results <- run_microglia_analysis(
     data_path = data_dir,
     integration_method = "Harmony",
     annotation_method = "SingleR"
 )
 
-# Visualize results
+## Visualize results
 plot_umap(results)
 plot_subtype_abundance(results)
 
