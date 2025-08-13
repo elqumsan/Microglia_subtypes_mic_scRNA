@@ -1,4 +1,4 @@
-# Microglia_subtypes_mic_scRNA :  Identification of Dysregulated Microglia Subtypes Induced by Antiretroviral Drug AZT Using Single-Cell RNA Sequencing. [Manuscript in preparation]
+# Microglia_subtypes_mice_scRNA :  Identification of Dysregulated Microglia Subtypes Induced by Antiretroviral Drug AZT Using Single-Cell RNA Sequencing. [Manuscript in preparation]
 
 ## Developers 
 
